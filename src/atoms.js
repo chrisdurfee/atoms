@@ -1,4 +1,4 @@
-import { Atom } from './atom.js';
+import { Atom } from '@base-framework/base';
 
 /**
  * Creates a generic HTML tag.

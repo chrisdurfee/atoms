@@ -2,7 +2,7 @@
   "name": "@base-framework/atoms",
   "version": "1.0.0",
   "description": "This will add default atoms to the base framework.",
-  "main": "/dist/atosm.js",
+  "main": "/dist/atoms.js",
   "scripts": {
     "build": "node ./esbuild.js",
     "prepublishOnly": "node ./esbuild.js"
