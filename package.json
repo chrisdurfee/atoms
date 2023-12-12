@@ -18,10 +18,10 @@
 	"license": "ISC",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/chrisdurfee/base.git"
+		"url": "git+https://github.com/chrisdurfee/atoms.git"
 	},
 	"bugs": {
-		"url": "https://github.com/chrisdurfee/base/issues"
+		"url": "https://github.com/chrisdurfee/atoms/issues"
 	},
 	"devDependencies": {
 		"esbuild": "^0.15.7"
@@ -34,5 +34,5 @@
 		"readme.md",
 		"dist"
 	],
-	"homepage": "https://github.com/chrisdurfee/base#readme"
+	"homepage": "https://github.com/chrisdurfee/atoms#readme"
 }
