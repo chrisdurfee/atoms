@@ -1,38 +1,38 @@
 {
-	"name": "@base-framework/atoms",
-	"version": "1.0.0",
-	"description": "This will add default atoms to the base framework.",
-	"main": "/dist/atosm.js",
-	"scripts": {
-		"build": "node ./esbuild.js",
-		"prepublishOnly": "node ./esbuild.js"
-	},
-	"keywords": [
-		"JavaScript",
-		"Framework",
-		"Base",
-		"ES6",
-		"Atoms"
-	],
-	"author": "Chris Durfee",
-	"license": "ISC",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/chrisdurfee/atoms.git"
-	},
-	"bugs": {
-		"url": "https://github.com/chrisdurfee/atoms/issues"
-	},
-	"devDependencies": {
-		"esbuild": "^0.15.7"
-	},
-	"dependencies": {
-		"@base-framework/base": "^3.0.5"
-	},
-	"files": [
-		"pacakge.json",
-		"readme.md",
-		"dist"
-	],
-	"homepage": "https://github.com/chrisdurfee/atoms#readme"
+  "name": "@base-framework/atoms",
+  "version": "1.0.0",
+  "description": "This will add default atoms to the base framework.",
+  "main": "/dist/atosm.js",
+  "scripts": {
+    "build": "node ./esbuild.js",
+    "prepublishOnly": "node ./esbuild.js"
+  },
+  "keywords": [
+    "JavaScript",
+    "Framework",
+    "Base",
+    "ES6",
+    "Atoms"
+  ],
+  "author": "Chris Durfee",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisdurfee/atoms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chrisdurfee/atoms/issues"
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.7"
+  },
+  "dependencies": {
+    "@base-framework/base": "^3.0.5"
+  },
+  "files": [
+    "pacakge.json",
+    "readme.md",
+    "dist"
+  ],
+  "homepage": "https://github.com/chrisdurfee/atoms#readme"
 }
