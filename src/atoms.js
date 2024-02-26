@@ -21,6 +21,15 @@ const Tag = (props, children) => {
 export const Div = Atom((props, children) => Tag(props, children));
 
 /**
+ * Creates a dialog element.
+ *
+ * @param {object} props - Properties for the div element.
+ * @param {array} children - Children elements of the div.
+ * @return {object} - Returns an object representing the dialog element.
+ */
+export const Dialog = Atom((props, children) => Tag({ ...props, tag: 'dialog' }, children));
+
+/**
  * Creates a span element.
  *
  * @param {object} props - Properties for the span element.
