@@ -62,6 +62,11 @@ export const A = Atom((props, children) => Tag({ ...props, tag: 'a' }, children)
 export const Button = Atom((props, children) => Tag({ ...props, tag: 'button' }, children));
 
 /**
+ * Creates a submit button element.
+ */
+export const SubmitButton = Atom((props, children) => Button({ ...props, type: 'submit' }, children));
+
+/**
  * Creates an unordered list (ul) element.
  */
 export const Ul = Atom((props, children) => Tag({ ...props, tag: 'ul' }, children));
