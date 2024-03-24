@@ -1,10 +1,10 @@
 {
   "name": "@base-framework/atoms",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "This will add default atoms to the base framework.",
   "main": "/dist/atoms.js",
   "scripts": {
-    "build": "node ./esbuild.js",
+    "build": "node ./esbuild.js && tsc",
     "prepublishOnly": "node ./esbuild.js"
   },
   "keywords": [
@@ -24,11 +24,13 @@
     "url": "https://github.com/chrisdurfee/atoms/issues"
   },
   "devDependencies": {
-    "esbuild": "^0.15.7"
+    "esbuild": "^0.15.7",
+    "typescript": "^5.4.2"
   },
   "dependencies": {
     "@base-framework/base": "^3.0.10"
   },
+  "types": "dist/types/base.d.ts",
   "files": [
     "pacakge.json",
     "readme.md",
