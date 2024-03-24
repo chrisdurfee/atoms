@@ -30,7 +30,7 @@
   "dependencies": {
     "@base-framework/base": "^3.0.10"
   },
-  "types": "dist/types/base.d.ts",
+  "types": "dist/types/atoms.d.ts",
   "files": [
     "pacakge.json",
     "readme.md",
