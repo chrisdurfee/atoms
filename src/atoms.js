@@ -140,6 +140,14 @@ export const Input = Atom((props) => Tag({ ...props, tag: 'input' }, null));
 export const Label = Atom((props, children) => Tag({ ...props, tag: 'label' }, children));
 
 /**
+ * Creates a checkbox input element.
+ *
+ * @param {object} props - Properties for the checkbox input element.
+ * @return {object} - Returns an object representing the checkbox input element.
+ */
+export const Checkbox = Atom((props) => Input({ ...props, type: 'checkbox' }));
+
+/**
  * Creates a section element.
  */
 export const Section = Atom((props, children) => Tag({ ...props, tag: 'section' }, children));
