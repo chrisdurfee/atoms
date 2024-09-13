@@ -8,6 +8,7 @@ build({
   minify: true,
   splitting: true,
   format: 'esm',  // Output format is ESM
-  target: ['esnext']
+  target: ['esnext'],
+  external: ['@base-framework/base']
 })
 .catch(() => process.exit(1));
