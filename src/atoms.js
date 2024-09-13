@@ -12,6 +12,77 @@ const Tag = (props, children) => {
 };
 
 /**
+ * Creates a Doctype tag.
+ *
+ * @param {object} props - Properties for the HTML element.
+ * @return {object} - Returns an object representing the HTML element.
+ */
+export const Doctype = (props) => ({ ...props, tag: 'DOCTYPE' });
+
+/**
+ * Creates an HTML tag.
+ *
+ * @param {object} props - Properties for the HTML element.
+ * @param {array} children - Children elements of the HTML element.
+ * @return {object} - Returns an object representing the HTML element.
+ */
+export const Html = Atom((props, children) => Tag({ ...props, tag: 'html' }, children));
+
+/**
+ * Creates a script tag.
+ *
+ * @param {object} props - Properties for the HTML element.
+ * @param {array} children - Children elements of the HTML element.
+ * @return {object} - Returns an object representing the HTML element.
+ */
+export const Script = Atom((props, children) => Tag({ ...props, tag: 'script' }, children));
+
+/**
+ * Creates a style tag.
+ *
+ * @param {object} props - Properties for the HTML element.
+ * @param {array} children - Children elements of the HTML element.
+ * @return {object} - Returns an object representing the HTML element.
+ */
+export const Style = Atom((props, children) => Tag({ ...props, tag: 'style' }, children));
+
+/**
+ * Creates a head tag.
+ *
+ * @param {object} props - Properties for the head element.
+ * @param {array} children - Children elements of the head.
+ * @return {object} - Returns an object representing the head element.
+ */
+export const Head = Atom((props, children) => Tag({ ...props, tag: 'head' }, children));
+
+/**
+ * Creates a title tag.
+ *
+ * @param {object} props - Properties for the title element.
+ */
+export const Title = (props) =>
+{
+    return { ...props };
+};
+
+/**
+ * Creates a meta tag.
+ *
+ * @param {object} props - Properties for the meta element.
+ * @return {object} - Returns an object representing the meta element.
+ */
+export const Meta = (props) => ({ ...props, tag: 'meta' });
+
+/**
+ * Creates a body tag.
+ *
+ * @param {object} props - Properties for the body element.
+ * @param {array} children - Children elements of the body.
+ * @return {object} - Returns an object representing the body element.
+ */
+export const Body = Atom((props, children) => Tag({ ...props, tag: 'body' }, children));
+
+/**
  * Creates a div element.
  *
  * @param {object} props - Properties for the div element.
