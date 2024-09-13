@@ -1,12 +1,13 @@
 {
   "name": "@base-framework/atoms",
-  "version": "1.0.10",
+  "version": "1.0.13",
   "description": "This will add default atoms to the base framework.",
-  "main": "/dist/atoms.js",
+  "main": "./dist/atoms.js",
   "scripts": {
     "build": "node ./esbuild.js && tsc",
     "prepublishOnly": "node ./esbuild.js"
   },
+  "type": "module",
   "keywords": [
     "JavaScript",
     "Framework",

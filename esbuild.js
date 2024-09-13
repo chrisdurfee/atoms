@@ -1,14 +1,13 @@
-const esbuild = require('esbuild');
+import { build } from 'esbuild';
 
-esbuild
-    .build({
-        entryPoints: ['src/atoms.js'],
-        outdir: 'dist',
-        bundle: true,
-        sourcemap: true,
-        minify: true,
-        splitting: true,
-        format: 'esm',
-        target: ['esnext']
-    })
-    .catch(() => process.exit(1));
+build({
+  entryPoints: ['src/atoms.js'],
+  outdir: 'dist',
+  bundle: true,
+  sourcemap: true,
+  minify: true,
+  splitting: true,
+  format: 'esm',  // Output format is ESM
+  target: ['esnext']
+})
+.catch(() => process.exit(1));
