@@ -74,6 +74,14 @@ export const Title = (props) =>
 export const Meta = (props) => ({ ...props, tag: 'meta' });
 
 /**
+ * Creates a link tag.
+ *
+ * @param {object} props - Properties for the link element.
+ * @return {object} - Returns an object representing the link element.
+ */
+export const Link = (props) => ({ ...props, tag: 'link' });
+
+/**
  * Creates a body tag.
  *
  * @param {object} props - Properties for the body element.
