@@ -230,26 +230,46 @@ export const H3 = Atom((props, children) => Tag({ ...props, tag: 'h3' }, childre
 
 /**
  * Creates a header 4 (h4) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const H4 = Atom((props, children) => Tag({ ...props, tag: 'h4' }, children));
 
 /**
  * Creates a header 5 (h5) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const H5 = Atom((props, children) => Tag({ ...props, tag: 'h5' }, children));
 
 /**
  * Creates a header 6 (h6) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const H6 = Atom((props, children) => Tag({ ...props, tag: 'h6' }, children));
 
 /**
  * Creates an input element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Input = Atom((props) => Tag({ ...props, tag: 'input' }, null));
 
 /**
  * Creates a label element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Label = Atom((props, children) => Tag({ ...props, tag: 'label' }, children));
 
@@ -263,56 +283,100 @@ export const Checkbox = Atom((props) => Input({ ...props, type: 'checkbox' }));
 
 /**
  * Creates a section element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Section = Atom((props, children) => Tag({ ...props, tag: 'section' }, children));
 
 /**
  * Creates an article element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Article = Atom((props, children) => Tag({ ...props, tag: 'article' }, children));
 
 /**
  * Creates a header (header) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Header = Atom((props, children) => Tag({ ...props, tag: 'header' }, children));
 
 /**
  * Creates a footer element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Footer = Atom((props, children) => Tag({ ...props, tag: 'footer' }, children));
 
 /**
  * Creates a nav element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Nav = Atom((props, children) => Tag({ ...props, tag: 'nav' }, children));
 
 /**
  * Creates an aside element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Aside = Atom((props, children) => Tag({ ...props, tag: 'aside' }, children));
 
 /**
  * Creates a figure element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Figure = Atom((props, children) => Tag({ ...props, tag: 'figure' }, children));
 
 /**
  * Creates a figcaption element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Figcaption = Atom((props, children) => Tag({ ...props, tag: 'figcaption' }, children));
 
 /**
  * Creates a main element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Main = Atom((props, children) => Tag({ ...props, tag: 'main' }, children));
 
 /**
  * Creates a video element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Video = Atom((props, children) => Tag({ ...props, tag: 'video' }, children));
 
 /**
  * Creates an audio element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Audio = Atom((props, children) => Tag({ ...props, tag: 'audio' }, children));
 
@@ -418,11 +482,19 @@ export const Dd = Atom((props, children) => Tag({ ...props, tag: 'dd' }, childre
 
 /**
  * Creates a fieldset element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Fieldset = Atom((props, children) => Tag({ ...props, tag: 'fieldset' }, children));
 
 /**
  * Creates a legend element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Legend = Atom((props, children) => Tag({ ...props, tag: 'legend' }, children));
 
@@ -443,6 +515,10 @@ export const Details = Atom((props, children) => Tag({ ...props, tag: 'details' 
 
 /**
  * Creates a summary element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Summary = Atom((props, children) => Tag({ ...props, tag: 'summary' }, children));
 
