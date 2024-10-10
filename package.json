@@ -1,41 +1,41 @@
 {
-  "name": "@base-framework/atoms",
-  "version": "1.0.19",
-  "description": "This will add default atoms to the base framework.",
-  "main": "./dist/atoms.js",
-  "scripts": {
-    "build": "node ./esbuild.js && tsc",
-    "prepublishOnly": "node ./esbuild.js"
-  },
-  "type": "module",
-  "keywords": [
-    "JavaScript",
-    "Framework",
-    "Base",
-    "ES6",
-    "Atoms"
-  ],
-  "author": "Chris Durfee",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/chrisdurfee/atoms.git"
-  },
-  "bugs": {
-    "url": "https://github.com/chrisdurfee/atoms/issues"
-  },
-  "devDependencies": {
-    "esbuild": "^0.15.7",
-    "typescript": "^5.4.2"
-  },
-  "dependencies": {
-    "@base-framework/base": "^3.0.10"
-  },
-  "types": "dist/types/atoms.d.ts",
-  "files": [
-    "pacakge.json",
-    "readme.md",
-    "dist"
-  ],
-  "homepage": "https://github.com/chrisdurfee/atoms#readme"
+	"name": "@base-framework/atoms",
+	"version": "1.0.20",
+	"description": "This will add default atoms to the base framework.",
+	"main": "./dist/atoms.js",
+	"scripts": {
+		"build": "node ./esbuild.js && tsc",
+		"prepublishOnly": "node ./esbuild.js"
+	},
+	"type": "module",
+	"keywords": [
+		"JavaScript",
+		"Framework",
+		"Base",
+		"ES6",
+		"Atoms"
+	],
+	"author": "Chris Durfee",
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/chrisdurfee/atoms.git"
+	},
+	"bugs": {
+		"url": "https://github.com/chrisdurfee/atoms/issues"
+	},
+	"devDependencies": {
+		"esbuild": "^0.15.7",
+		"typescript": "^5.4.2"
+	},
+	"dependencies": {
+		"@base-framework/base": "^3.0.10"
+	},
+	"types": "dist/types/atoms.d.ts",
+	"files": [
+		"pacakge.json",
+		"readme.md",
+		"dist"
+	],
+	"homepage": "https://github.com/chrisdurfee/atoms#readme"
 }
