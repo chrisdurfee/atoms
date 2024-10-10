@@ -5,7 +5,7 @@ import { Atom } from '@base-framework/base';
  *
  * @param {object} props - Properties for the HTML element.
  * @param {array} children - Children elements of the HTML element.
- * @return {object} - Returns an object representing the HTML element.
+ * @returns {object} - Returns an object representing the HTML element.
  */
 const Tag = (props, children) => {
     return { ...props, children };
@@ -15,7 +15,7 @@ const Tag = (props, children) => {
  * Creates a Doctype tag.
  *
  * @param {object} props - Properties for the HTML element.
- * @return {object} - Returns an object representing the HTML element.
+ * @returns {object} - Returns an object representing the HTML element.
  */
 export const Doctype = (props) => ({ ...props, tag: 'DOCTYPE' });
 
@@ -24,7 +24,7 @@ export const Doctype = (props) => ({ ...props, tag: 'DOCTYPE' });
  *
  * @param {object} props - Properties for the HTML element.
  * @param {array} children - Children elements of the HTML element.
- * @return {object} - Returns an object representing the HTML element.
+ * @returns {object} - Returns an object representing the HTML element.
  */
 export const Html = Atom((props, children) => Tag({ ...props, tag: 'html' }, children));
 
@@ -33,7 +33,7 @@ export const Html = Atom((props, children) => Tag({ ...props, tag: 'html' }, chi
  *
  * @param {object} props - Properties for the HTML element.
  * @param {array} children - Children elements of the HTML element.
- * @return {object} - Returns an object representing the HTML element.
+ * @returns {object} - Returns an object representing the HTML element.
  */
 export const Script = Atom((props, children) => Tag({ ...props, tag: 'script' }, children));
 
@@ -42,7 +42,7 @@ export const Script = Atom((props, children) => Tag({ ...props, tag: 'script' },
  *
  * @param {object} props - Properties for the HTML element.
  * @param {array} children - Children elements of the HTML element.
- * @return {object} - Returns an object representing the HTML element.
+ * @returns {object} - Returns an object representing the HTML element.
  */
 export const Style = Atom((props, children) => Tag({ ...props, tag: 'style' }, children));
 
@@ -51,7 +51,7 @@ export const Style = Atom((props, children) => Tag({ ...props, tag: 'style' }, c
  *
  * @param {object} props - Properties for the head element.
  * @param {array} children - Children elements of the head.
- * @return {object} - Returns an object representing the head element.
+ * @returns {object} - Returns an object representing the head element.
  */
 export const Head = Atom((props, children) => Tag({ ...props, tag: 'head' }, children));
 
@@ -69,7 +69,7 @@ export const Title = (props) =>
  * Creates a meta tag.
  *
  * @param {object} props - Properties for the meta element.
- * @return {object} - Returns an object representing the meta element.
+ * @returns {object} - Returns an object representing the meta element.
  */
 export const Meta = (props) => ({ ...props, tag: 'meta' });
 
@@ -77,7 +77,7 @@ export const Meta = (props) => ({ ...props, tag: 'meta' });
  * Creates a link tag.
  *
  * @param {object} props - Properties for the link element.
- * @return {object} - Returns an object representing the link element.
+ * @returns {object} - Returns an object representing the link element.
  */
 export const Link = (props) => ({ ...props, tag: 'link' });
 
@@ -86,7 +86,7 @@ export const Link = (props) => ({ ...props, tag: 'link' });
  *
  * @param {object} props - Properties for the body element.
  * @param {array} children - Children elements of the body.
- * @return {object} - Returns an object representing the body element.
+ * @returns {object} - Returns an object representing the body element.
  */
 export const Body = Atom((props, children) => Tag({ ...props, tag: 'body' }, children));
 
@@ -95,7 +95,7 @@ export const Body = Atom((props, children) => Tag({ ...props, tag: 'body' }, chi
  *
  * @param {object} props - Properties for the div element.
  * @param {array} children - Children elements of the div.
- * @return {object} - Returns an object representing the div element.
+ * @returns {object} - Returns an object representing the div element.
  */
 export const Div = Atom((props, children) => Tag(props, children));
 
@@ -104,7 +104,7 @@ export const Div = Atom((props, children) => Tag(props, children));
  *
  * @param {object} props - Properties for the div element.
  * @param {array} children - Children elements of the div.
- * @return {object} - Returns an object representing the dialog element.
+ * @returns {object} - Returns an object representing the dialog element.
  */
 export const Dialog = Atom((props, children) => Tag({ ...props, tag: 'dialog' }, children));
 
@@ -113,7 +113,7 @@ export const Dialog = Atom((props, children) => Tag({ ...props, tag: 'dialog' },
  *
  * @param {object} props - Properties for the span element.
  * @param {array} children - Children elements of the span.
- * @return {object} - Returns an object representing the span element.
+ * @returns {object} - Returns an object representing the span element.
  */
 export const Span = Atom((props, children) => Tag({ ...props, tag: 'span' }, children));
 
@@ -122,7 +122,7 @@ export const Span = Atom((props, children) => Tag({ ...props, tag: 'span' }, chi
  *
  * @param {object} props - Properties for the paragraph element.
  * @param {array} children - Children elements of the paragraph.
- * @return {object} - Returns an object representing the paragraph element.
+ * @returns {object} - Returns an object representing the paragraph element.
  */
 export const P = Atom((props, children) => Tag({ ...props, tag: 'p' }, children));
 
@@ -137,21 +137,37 @@ export const A = Atom((props, children) => Tag({ ...props, tag: 'a' }, children)
 
 /**
  * Creates a button element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Button = Atom((props, children) => Tag({ ...props, tag: 'button' }, children));
 
 /**
  * Creates a submit button element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const SubmitButton = Atom((props, children) => Button({ ...props, type: 'submit' }, children));
 
 /**
  * Creates an unordered list (ul) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Ul = Atom((props, children) => Tag({ ...props, tag: 'ul' }, children));
 
 /**
  * Creates a list item (li) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const Li = Atom((props, children) => Tag({ ...props, tag: 'li' }, children));
 
@@ -164,32 +180,51 @@ export const Img = Atom((props) => Tag({ ...props, tag: 'img' }, null));
  * Create a br element.
  *
  * @param {object} props - Properties for the br element.
- * @return {object} - Returns an object representing the br element.
+ * @returns {object} - Returns an object representing the br element.
  */
 export const Br = Atom((props) => Tag({ ...props, tag: 'br' }, null));
 
 /**
  * Creates a horizontal rule (hr) element.
+ *
+ * @param {object} props - Properties for the hr element.
+ * @returns {object} - Returns an object representing the hr element.
  */
 export const Hr = Atom((props) => Tag({ ...props, tag: 'hr' }, null));
 
 /**
  * Creates a text (text) element.
+ *
+ * @param {object} props - Properties for the text element.
+ * @param {array} children - Children elements of the text element.
+ * @returns {object} - Returns an object representing the text element.
  */
 export const Text = Atom((props, children) => Tag({ ...props, tag: 'text' }, children));
 
 /**
  * Creates a header 1 (h1) element.
+ *
+ * @param {object} props - Properties for the h1 element.
+ * @param {array} children - Children elements of the h1 element.
+ * @returns {object} - Returns an object representing the h1 element.
  */
 export const H1 = Atom((props, children) => Tag({ ...props, tag: 'h1' }, children));
 
 /**
  * Creates a header 2 (h2) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const H2 = Atom((props, children) => Tag({ ...props, tag: 'h2' }, children));
 
 /**
  * Creates a header 3 (h3) element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {array} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
  */
 export const H3 = Atom((props, children) => Tag({ ...props, tag: 'h3' }, children));
 
@@ -222,7 +257,7 @@ export const Label = Atom((props, children) => Tag({ ...props, tag: 'label' }, c
  * Creates a checkbox input element.
  *
  * @param {object} props - Properties for the checkbox input element.
- * @return {object} - Returns an object representing the checkbox input element.
+ * @returns {object} - Returns an object representing the checkbox input element.
  */
 export const Checkbox = Atom((props) => Input({ ...props, type: 'checkbox' }));
 
