@@ -192,6 +192,16 @@ On(this.route, 'loaded', (loaded) => (!loaded)
 
 ```
 
+The callback function will be called when the data property changes. The callback function will be called with the new value of the data property, the element that the watcher is using, and the parent component.
+
+```javascript
+// the new stata value, the element that the watcher is using, the parent component object
+(loaded, element, parent) =>
+{
+    // handle the loaded state
+}
+```
+
 ## Contributing
 
 Contributions to Base Framework are welcome. Follow these steps to contribute:
