@@ -180,7 +180,7 @@ On('loaded', (loaded) => (!loaded)
 
 ```
 
-The second overload allows for a custom data source to be used. This alllows for more flexibility with the layouts.
+The second overload allows for a custom data source to be used. This allows for more flexibility with the layouts.
 
 ```javascript
 
