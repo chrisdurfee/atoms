@@ -19,7 +19,7 @@ Atoms can be instantiated using various methodologies:
 ### Function Atoms
 These atoms are instantiated with either standard functions or arrow functions, equipped with a props object to transfer properties to the atoms.
 
-```typescript
+```javascript
 const Div = (props, children) => ({
     ...props,
     children
@@ -29,7 +29,7 @@ const Div = (props, children) => ({
 ### Atom Callbacks
 Atoms may be created using the Atom function, which accepts a callback function as its sole parameter. The callback function is passed a props object and children array and returns an object containing the atom's layout.
 
-```typescript
+```javascript
 const Button = Atom((props, children) => ({
     tag: 'button',
     ...props,
@@ -40,7 +40,7 @@ const Button = Atom((props, children) => ({
 #### Atom Nesting
 Atoms should use composition to nest other atoms. This is achieved by passing the children array to the atoms args.
 
-```typescript
+```javascript
 const SecondaryButton = Atom((props, children) => (Button({
     ...props,
     class: 'secondary-btn',
@@ -52,7 +52,7 @@ const SecondaryButton = Atom((props, children) => (Button({
 Event listener callbacks within atoms accept two parameters: the originating event object and the "parent" component object in which the atom resides.
 
 ### Accessing the Parent Component in an Atom
-```typescript
+```javascript
 class Page extends Component
 {
     render()
@@ -128,7 +128,7 @@ Section([
 Special atoms are atoms that have been pre-configured with specific properties. These atoms are designed to simplify the creation of common components. This library has a few special atoms that can help create complex actions.
 
 ### On Atom
-The On atom allows a child to be added or removed based on a bindable data property. This atom makes the child not need to have am "onSet" property on a parent wrapper allowing for easier layouts with less code.
+The On atom allows a child to be added or removed based on a bindable data property. This atom makes the child not need to have an "onSet" property on a parent wrapper allowing for easier layouts with less code.
 
 ```javascript
 
