@@ -124,6 +124,74 @@ Section([
 ])
 ```
 
+## Special Atoms
+Special atoms are atoms that have been pre-configured with specific properties. These atoms are designed to simplify the creation of common components. This library has a few special atoms that can help create complex actions.
+
+### On Atom
+The On atom allows a child to be added or removed based on a bindable data property. This atom makes the child not need to have am "onSet" property on a parent wrapper allowing for easier layouts with less code.
+
+```javascript
+
+// The traditional way using a parent wrapper with an onSet property
+Div({
+    class: "p-4 transition",
+    onState: ["loaded", (loaded) => (!loaded)
+        ? SkeletonPost()
+        : Post(post)
+    ]
+})
+
+// The new way using the On atom
+Div({ class: "p-4 transition" }, [
+    On('loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+])
+
+// Or with a state
+Div({ class: "p-4 transition" }, [
+    OnState('loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+])
+
+// Children can now be added dynamically without a wrapper
+Div({ class: "p-4 transition" }, [
+    H1('Title'),
+
+    // this will add or remove this child based on the loaded state
+    On('loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+])
+
+```
+
+The On and OnState atoms support two overloads. The first overload is the data property to bind to and the second is the callback function that will be called when the data property changes.
+
+### On Atom Overloads
+```javascript
+
+// This will watch to the component data, or context data, or component state in that order if the first two are not set in the component.
+// data property, callback
+On('loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+
+```
+
+The second overload allows for a custom data source to be use. This alllows for more flexibility with the layouts.
+
+```javascript
+
+// watching on the component route
+// data source, data property, callback
+On(this.route, 'loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+
+```
+
 ## Contributing
 
 Contributions to Base Framework are welcome. Follow these steps to contribute:
