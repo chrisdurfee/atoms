@@ -167,7 +167,7 @@ Div({ class: "p-4 transition" }, [
 
 ```
 
-The On and OnState atoms support two overloads. The first overload is the data property to bind to and the second is the callback function that will be called when the data property changes.
+The On, OnState, and OnRoute atoms support two overloads. The first overload is the data property to bind to and the second is the callback function that will be called when the data property changes.
 
 ### On Atom Overloads
 ```javascript
@@ -187,6 +187,11 @@ The second overload allows for a custom data source to be used. This allows for 
 // watching on the component route
 // data source, data property, callback
 On(this.route, 'loaded', (loaded) => (!loaded)
+    ? SkeletonPost()
+    : Post(post))
+
+// With the OnRoute Atom
+OnRoute('loaded', (loaded) => (!loaded)
     ? SkeletonPost()
     : Post(post))
 

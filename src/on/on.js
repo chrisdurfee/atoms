@@ -230,3 +230,45 @@ export const OnState = (...args) =>
         }
     });
 };
+
+/**
+ * This will create an on route tag.
+ *
+ * @overload
+ * @param {object} data
+ * @param {string} prop
+ * @param {function} callBack
+ *
+ * @overload
+ * @param {string} prop
+ * @param {function} callBack
+ *
+ * @returns {object}
+ */
+export const OnRoute = (...args) =>
+{
+    const settings = [...args];
+    const callBack = settings.pop();
+    if (typeof callBack !== 'function')
+    {
+        return;
+    }
+
+    /**
+     * This will create a comment to use as a placeholder
+     * to keep the layout in place.
+     */
+    return Comment({
+        onCreated: (ele, parent) =>
+        {
+            if (settings.length < 2)
+            {
+                const data = parent.route;
+                settings.unshift(data);
+            }
+
+            const update = updateLayout(callBack, ele, settings[1], parent);
+            dataBinder.watch(ele, settings[0], settings[1], update);
+        }
+    });
+};
