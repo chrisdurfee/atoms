@@ -92,7 +92,7 @@ const updateLayout = (callBack, ele, prop, parent) =>
         /**
          * This will set the previous result if needed.
          */
-        //layout = checkPreviousResult(parent, prop, value, layout);
+        layout = checkPreviousResult(parent, prop, value, layout);
 
         /**
          * This will build the layout and insert it after the
