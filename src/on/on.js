@@ -1,4 +1,5 @@
 import { Builder, dataBinder } from "@base-framework/base";
+import { Comment as BaseComment } from "src/comment.js";
 
 /**
  * This will set a previous result.
@@ -111,9 +112,8 @@ const updateLayout = (callBack, ele, prop, parent) =>
  * @param {object} props
  * @returns {object}
  */
-const Comment = (props) => ({
-    tag: 'comment',
-    textContent: 'on placeholder',
+const Comment = (props) => BaseComment({
+    type: 'on',
     onCreated: props.onCreated
 });
 

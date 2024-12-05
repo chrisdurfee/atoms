@@ -207,6 +207,20 @@ The callback function will be called when the data property changes. The callbac
 }
 ```
 
+### Use Parent Atom
+
+The UseParent atom allows for the parent component to be accessed in a child atom. This atom is useful when a child atom needs to access the parent component.
+
+```javascript
+UseParent((parent) =>
+{
+    // access the parent component
+    return Div({
+        class: parent.state.loaded ? 'loaded' : 'loading'
+    });
+})
+```
+
 ## Contributing
 
 Contributions to Base Framework are welcome. Follow these steps to contribute:
