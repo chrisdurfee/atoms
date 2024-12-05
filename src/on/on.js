@@ -92,7 +92,7 @@ const updateLayout = (callBack, ele, prop, parent) =>
         /**
          * This will set the previous result if needed.
          */
-        layout = checkPreviousResult(parent, prop, value, layout);
+        //layout = checkPreviousResult(parent, prop, value, layout);
 
         /**
          * This will build the layout and insert it after the
@@ -247,13 +247,6 @@ export const OnState = (...args) =>
  */
 export const OnRoute = (...args) =>
 {
-    const settings = [...args];
-    const callBack = settings.pop();
-    if (typeof callBack !== 'function')
-    {
-        return;
-    }
-
     /**
      * This will create a comment to use as a placeholder
      * to keep the layout in place.
@@ -261,12 +254,19 @@ export const OnRoute = (...args) =>
     return Comment({
         onCreated: (ele, parent) =>
         {
-            if (settings.length < 2)
+            const settings = [...args];
+            const callBack = settings.pop();
+            if (typeof callBack !== 'function')
             {
-                const data = parent.route;
-                settings.unshift(data);
+                return;
             }
 
+            if (settings.length < 2)
+            {
+                settings.unshift(parent.route);
+            }
+
+            console.log(settings);
             const update = updateLayout(callBack, ele, settings[1], parent);
             dataBinder.watch(ele, settings[0], settings[1], update);
         }
