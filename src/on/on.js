@@ -266,7 +266,6 @@ export const OnRoute = (...args) =>
                 settings.unshift(parent.route);
             }
 
-            console.log(settings);
             const update = updateLayout(callBack, ele, settings[1], parent);
             dataBinder.watch(ele, settings[0], settings[1], update);
         }
