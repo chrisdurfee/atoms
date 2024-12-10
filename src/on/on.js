@@ -77,7 +77,7 @@ const updateLayout = (callBack, ele, prop, parent) =>
     return (value) =>
     {
         let layout = callBack(value, ele, parent);
-        if (typeof layout === "undefined")
+        if (layout === undefined)
         {
             return;
         }
