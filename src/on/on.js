@@ -37,10 +37,10 @@ const checkPreviousResult = (parent, prop, value, result) =>
  */
 const setPreviousResult = (parent, prop, value, result) =>
 {
-    let key = prop + ':' + value,
+    const key = `${prop}:${value}`,
     state = parent.state,
     previousResult = state.get(key);
-    if (typeof previousResult !== 'undefined')
+    if (previousResult !== undefined)
     {
         result = previousResult;
     }
