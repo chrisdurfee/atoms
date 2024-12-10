@@ -12,7 +12,7 @@ import { Comment as BaseComment } from "src/comment.js";
 const updateLayout = (callBack, ele, parent) =>
 {
     const layout = callBack(parent);
-    if (typeof layout === "undefined")
+    if (layout === undefined)
     {
         return;
     }
