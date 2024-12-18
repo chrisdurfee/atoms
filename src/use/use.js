@@ -52,13 +52,6 @@ const Comment = (props) => BaseComment({
  */
 export const UseParent = (...args) =>
 {
-    const settings = [...args];
-    const callBack = settings.pop();
-    if (typeof callBack !== 'function')
-    {
-        return;
-    }
-
     /**
      * This will create a comment to use as a placeholder
      * to keep the layout in place.
@@ -66,6 +59,12 @@ export const UseParent = (...args) =>
     return Comment({
         onCreated: (ele, parent) =>
         {
+            const settings = [...args];
+            const callBack = settings.pop();
+            if (typeof callBack !== 'function')
+            {
+                return;
+            }
             updateLayout(callBack, ele, parent);
         }
     });
