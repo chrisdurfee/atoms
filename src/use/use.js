@@ -39,26 +39,11 @@ const Comment = (props) => BaseComment({
 /**
  * This will create a use parent tag.
  *
- * @overload
- * @param {object} data
- * @param {string} prop
  * @param {function} callBack
- *
- * @overload
- * @param {string} prop
- * @param {function} callBack
- *
  * @returns {object}
  */
-export const UseParent = (...args) =>
+export const UseParent = (callBack) =>
 {
-    const settings = [...args];
-    const callBack = settings.pop();
-    if (typeof callBack !== 'function')
-    {
-        return;
-    }
-
     /**
      * This will create a comment to use as a placeholder
      * to keep the layout in place.
