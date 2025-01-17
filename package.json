@@ -1,6 +1,6 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.0.40",
+	"version": "1.0.41",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
@@ -29,7 +29,7 @@
 		"typescript": "^5.4.2"
 	},
 	"dependencies": {
-		"@base-framework/base": "^3.0.184"
+		"@base-framework/base": "^3.0.258"
 	},
 	"types": "dist/types/atoms.d.ts",
 	"files": [
