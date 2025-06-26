@@ -1,7 +1,7 @@
 import { Atom } from '@base-framework/base';
-import { On, OnRoute, OnState } from './on/on.js';
+import { If, On, OnRoute, OnState } from './on/on.js';
 import { UseParent } from './use/use.js';
-export { On, OnRoute, OnState, UseParent };
+export { If, On, OnRoute, OnState, UseParent };
 
 /**
  * Creates a generic HTML tag.

@@ -11,18 +11,18 @@ import { Comment as BaseComment } from "src/comment.js";
  */
 const updateLayout = (callBack, ele, parent) =>
 {
-    const layout = callBack(parent);
-    if (layout === undefined)
-    {
-        return;
-    }
+	const layout = callBack(parent);
+	if (layout === undefined)
+	{
+		return;
+	}
 
-    /**
-     * This will build the layout and insert it after the
-     * comment element.
-     */
-    const frag = Builder.build(layout, null, parent);
-    ele.parentNode.insertBefore(frag, ele.nextSibling);
+	/**
+	 * This will build the layout and insert it after the
+	 * comment element.
+	 */
+	const frag = Builder.build(layout, null, parent);
+	ele.parentNode.insertBefore(frag, ele.nextSibling);
 };
 
 /**
@@ -32,8 +32,8 @@ const updateLayout = (callBack, ele, parent) =>
  * @returns {object}
  */
 const Comment = (props) => BaseComment({
-    type: 'use',
-    onCreated: props.onCreated
+	type: 'use',
+	onCreated: props.onCreated
 });
 
 /**
@@ -44,14 +44,14 @@ const Comment = (props) => BaseComment({
  */
 export const UseParent = (callBack) =>
 {
-    /**
-     * This will create a comment to use as a placeholder
-     * to keep the layout in place.
-     */
-    return Comment({
-        onCreated: (ele, parent) =>
-        {
-            updateLayout(callBack, ele, parent);
-        }
-    });
+	/**
+	 * This will create a comment to use as a placeholder
+	 * to keep the layout in place.
+	 */
+	return Comment({
+		onCreated: (ele, parent) =>
+		{
+			updateLayout(callBack, ele, parent);
+		}
+	});
 };
