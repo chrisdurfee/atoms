@@ -329,3 +329,57 @@ export const If = (...args) =>
 		}
 	});
 };
+
+/**
+ * This will create an if state tag.
+ *
+ * @overload
+ * @param {object} data
+ * @param {string} prop
+ * @param {*} value
+ * @param {function} callBack
+ *
+ * @overload
+ * @param {string} prop
+ * @param {*} value
+ * @param {function} callBack
+ *
+ * @returns {object}
+ */
+export const IfState = (...args) =>
+{
+	const settings = [...args];
+	const callBack = settings.pop();
+	if (typeof callBack !== 'function')
+	{
+		return;
+	}
+
+	/**
+	 * This will create a comment to use as a placeholder
+	 * to keep the layout in place.
+	 */
+	return Comment({
+		onCreated: (ele, parent) =>
+		{
+			if (settings.length < 2)
+			{
+				const data = parent.state;
+				settings.unshift(data);
+			}
+
+			/**
+			 * This will check if the value is set and
+			 * if it matches the setting value.
+			 */
+			const settingValue = settings[2];
+			const updateCallback = (value, ele, parent) =>
+			{
+				return (value === settingValue)? callBack(value, ele, parent) : null;
+			};
+
+			const update = updateLayout(updateCallback, ele, settings[1], parent);
+			dataBinder.watch(ele, settings[0], settings[1], update);
+		}
+	});
+};
