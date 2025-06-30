@@ -18,34 +18,6 @@ const checkPreviousResult = (parent, prop, value, result) =>
 		return result;
 	}
 
-	if (result.isUnit !== true || parent.persist !== true || !parent.state)
-	{
-		return result;
-	}
-
-	return result;
-};
-
-/**
- * This will set the previous result.
- *
- * @param {object} parent
- * @param {string} prop
- * @param {string} value
- * @param {object} result
- * @returns {*}
- */
-const setPreviousResult = (parent, prop, value, result) =>
-{
-	const key = `${prop}:${value}`,
-	state = parent.state,
-	previousResult = state.get(key);
-	if (previousResult !== undefined)
-	{
-		result = previousResult;
-	}
-
-	state.set(key, result);
 	return result;
 };
 
