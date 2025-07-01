@@ -162,6 +162,53 @@ export const On = (...args) =>
 };
 
 /**
+ * This will create an on data load tag.
+ *
+ * @overload
+ * @param {object} data
+ * @param {string} prop
+ * @param {function} callBack
+ *
+ * @overload
+ * @param {string} prop
+ * @param {function} callBack
+ *
+ * @returns {object}
+ */
+export const OnLoad = (...args) =>
+{
+	const settings = [...args];
+	const callBack = settings.pop();
+	if (typeof callBack !== 'function')
+	{
+		return;
+	}
+
+	/**
+	 * This will create a comment to use as a placeholder
+	 * to keep the layout in place.
+	 */
+	return Comment({
+		onCreated: (ele, parent) =>
+		{
+			if (settings.length < 2)
+			{
+				/**
+				 * This will get the parent data and add it to the
+				 * settings array.
+				 */
+				const data = getParentData(parent);
+				settings.unshift(data);
+			}
+
+			const prop = 'loaded';
+			const update = updateLayout(callBack, ele, prop, parent);
+			dataBinder.watch(ele, settings[0], prop, update);
+		}
+	});
+};
+
+/**
  * This will create an on state tag.
  *
  * @overload
