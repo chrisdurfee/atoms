@@ -162,53 +162,6 @@ export const On = (...args) =>
 };
 
 /**
- * This will create an on data load tag.
- *
- * @overload
- * @param {object} data
- * @param {string} prop
- * @param {function} callBack
- *
- * @overload
- * @param {string} prop
- * @param {function} callBack
- *
- * @returns {object}
- */
-export const OnLoad = (...args) =>
-{
-	const settings = [...args];
-	const callBack = settings.pop();
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = getParentData(parent);
-				settings.unshift(data);
-			}
-
-			const prop = 'loaded';
-			const update = updateLayout(callBack, ele, prop, parent);
-			dataBinder.watch(ele, settings[0], prop, update);
-		}
-	});
-};
-
-/**
  * This will create an on state tag.
  *
  * @overload
@@ -399,6 +352,65 @@ export const IfState = (...args) =>
 
 			const update = updateLayout(updateCallback, ele, settings[1], parent);
 			dataBinder.watch(ele, settings[0], settings[1], update);
+		}
+	});
+};
+
+/**
+ * This will create an on load data tag.
+ *
+ * @overload
+ * @param {object} data
+ * @param {function} callBack
+ * @param {function|object|null} [notLoaded=null]
+ *
+ * @overload
+ * @param {function} callBack
+ * @param {function|object|null} [notLoaded=null]
+ *
+ * @returns {object}
+ */
+export const OnLoad = (...args) =>
+{
+	const settings = [...args];
+	const callBack = (typeof settings[0] !== 'function') ? settings[0] : settings[1];
+	if (typeof callBack !== 'function')
+	{
+		return;
+	}
+
+	/**
+	 * This will create a comment to use as a placeholder
+	 * to keep the layout in place.
+	 */
+	return Comment({
+		onCreated: (ele, parent) =>
+		{
+			if (settings.length < 2)
+			{
+				/**
+				 * This will get the parent data and add it to the
+				 * settings array.
+				 */
+				const data = getParentData(parent);
+				settings.unshift(data);
+			}
+
+			const notLoaded = (settings.length === 3)? settings[2] : null;
+
+			/**
+			 * This will check if the value is set and
+			 * if it matches the setting value.
+			 */
+			const settingValue = true;
+			const updateCallback = (value, ele, parent) =>
+			{
+				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
+			};
+
+			const prop = 'loaded';
+			const update = updateLayout(updateCallback, ele, prop, parent);
+			dataBinder.watch(ele, settings[0], prop, update);
 		}
 	});
 };
