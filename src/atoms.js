@@ -837,3 +837,11 @@ export const Bdo = Atom((props, children) => Tag({ ...props, tag: 'bdo' }, child
  * @returns {object} - Returns an object representing the element.
  */
 export const Wbr = Atom((props) => Tag({ ...props, tag: 'wbr' }, null));
+
+/**
+ * This will create a comment.
+ *
+ * @param {object} props
+ * @returns {object}
+ */
+export const Comment = Atom((props) => Tag({ ...props, tag: 'comment' }, null));
