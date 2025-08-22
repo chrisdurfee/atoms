@@ -526,7 +526,7 @@ export const OnOpen = (...args) =>
 				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
 			};
 
-			const prop = 'loaded';
+			const prop = 'open';
 			const update = updateLayout(updateCallback, ele, prop, parent);
 			dataBinder.watch(ele, settings[0], prop, update);
 		}
@@ -585,7 +585,7 @@ export const OnStateOpen = (...args) =>
 				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
 			};
 
-			const prop = 'loaded';
+			const prop = 'open';
 			const update = updateLayout(updateCallback, ele, prop, parent);
 			dataBinder.watch(ele, settings[0], prop, update);
 		}
