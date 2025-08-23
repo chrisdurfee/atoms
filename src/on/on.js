@@ -373,7 +373,7 @@ export const IfState = (...args) =>
 export const OnLoad = (...args) =>
 {
 	const settings = [...args];
-	const callBack = (typeof settings[0] !== 'function') ? settings[0] : settings[1];
+	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
 	if (typeof callBack !== 'function')
 	{
 		return;
@@ -432,7 +432,7 @@ export const OnLoad = (...args) =>
 export const OnStateLoad = (...args) =>
 {
 	const settings = [...args];
-	const callBack = (typeof settings[0] !== 'function') ? settings[0] : settings[1];
+	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
 	if (typeof callBack !== 'function')
 	{
 		return;
@@ -491,7 +491,7 @@ export const OnStateLoad = (...args) =>
 export const OnOpen = (...args) =>
 {
 	const settings = [...args];
-	const callBack = (typeof settings[0] !== 'function') ? settings[0] : settings[1];
+	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
 	if (typeof callBack !== 'function')
 	{
 		return;
@@ -514,7 +514,7 @@ export const OnOpen = (...args) =>
 				settings.unshift(data);
 			}
 
-			const notLoaded = (settings.length === 3)? settings[2] : null;
+			const notOpen = null;
 
 			/**
 			 * This will check if the value is set and
@@ -523,7 +523,7 @@ export const OnOpen = (...args) =>
 			const settingValue = true;
 			const updateCallback = (value, ele, parent) =>
 			{
-				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
+				return (value == settingValue)? callBack(value, ele, parent) : notOpen;
 			};
 
 			const prop = 'open';
@@ -550,7 +550,7 @@ export const OnOpen = (...args) =>
 export const OnStateOpen = (...args) =>
 {
 	const settings = [...args];
-	const callBack = (typeof settings[0] !== 'function') ? settings[0] : settings[1];
+	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
 	if (typeof callBack !== 'function')
 	{
 		return;
@@ -573,7 +573,7 @@ export const OnStateOpen = (...args) =>
 				settings.unshift(data);
 			}
 
-			const notLoaded = (settings.length === 3)? settings[2] : null;
+			const notOpen = null;
 
 			/**
 			 * This will check if the value is set and
@@ -582,7 +582,7 @@ export const OnStateOpen = (...args) =>
 			const settingValue = true;
 			const updateCallback = (value, ele, parent) =>
 			{
-				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
+				return (value == settingValue)? callBack(value, ele, parent) : notOpen;
 			};
 
 			const prop = 'open';
