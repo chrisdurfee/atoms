@@ -1,6 +1,6 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.0.63",
+	"version": "1.0.64",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
@@ -42,7 +42,8 @@
 		".": {
 			"import": "./dist/atoms.js",
 			"require": "./dist/atoms.js"
-		}
+		},
+		"./copilot.md": "./copilot.md"
 	},
 	"homepage": "https://github.com/chrisdurfee/atoms#readme"
 }
