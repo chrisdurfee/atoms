@@ -207,6 +207,152 @@ The callback function will be called when the data property changes. The callbac
 }
 ```
 
+### OnLoad and OnStateLoad Atoms
+The OnLoad and OnStateLoad atoms are specialized versions that automatically watch for a 'loaded' property. OnLoad watches component data/context/state, while OnStateLoad specifically watches component state.
+
+```javascript
+// OnLoad - watches for 'loaded' property in component data/context/state
+Div({ class: "content-container" }, [
+    H1('My Content'),
+
+    // Shows content when loaded is true, nothing when false
+    OnLoad((loaded, element, parent) =>
+        Div({ class: "loaded-content" }, [
+            P('Content has been loaded!')
+        ])
+    ),
+
+    // With a fallback for when not loaded
+    OnLoad(
+        (loaded, element, parent) =>
+            Div({ class: "loaded-content" }, [
+                P('Content loaded successfully!')
+            ]),
+        // Fallback content when not loaded
+        Div({ class: "loading-spinner" }, 'Loading...')
+    )
+])
+
+// OnStateLoad - specifically watches component state
+Div({ class: "dashboard" }, [
+    OnStateLoad((loaded, element, parent) =>
+        Dashboard({ data: parent.state.dashboardData })
+    )
+])
+```
+
+### OnOpen and OnStateOpen Atoms
+The OnOpen and OnStateOpen atoms watch for an 'open' property to show/hide content. Useful for modals, dropdowns, and collapsible content.
+
+```javascript
+// OnOpen - watches for 'open' property in component data/context/state
+Div({ class: "modal-container" }, [
+    Button({
+        click: (e, parent) => parent.data.open = true
+    }, 'Open Modal'),
+
+    // Modal only shows when open is true
+    OnOpen((open, element, parent) =>
+        Div({ class: "modal-overlay" }, [
+            Div({ class: "modal-content" }, [
+                H2('Modal Title'),
+                P('Modal content goes here'),
+                Button({
+                    click: (e, parent) => parent.data.open = false
+                }, 'Close')
+            ])
+        ])
+    )
+])
+
+// OnStateOpen - specifically watches component state
+Nav({ class: "navigation" }, [
+    Button({
+        click: (e, parent) => parent.state.open = !parent.state.open
+    }, 'Toggle Menu'),
+
+    OnStateOpen((open, element, parent) =>
+        Ul({ class: "nav-menu" }, [
+            Li(A({ href: "/home" }, 'Home')),
+            Li(A({ href: "/about" }, 'About')),
+            Li(A({ href: "/contact" }, 'Contact'))
+        ])
+    )
+])
+```
+
+### If and IfState Atoms
+The If and IfState atoms allow conditional rendering based on exact value matches. They take a property name, expected value, and callback function.
+
+```javascript
+// If - watches component data/context/state for exact value match
+Div({ class: "user-profile" }, [
+    H1('User Profile'),
+
+    // Show admin panel only when role equals 'admin'
+    If('role', 'admin', (role, element, parent) =>
+        Div({ class: "admin-panel" }, [
+            H2('Admin Controls'),
+            Button('Manage Users'),
+            Button('System Settings')
+        ])
+    ),
+
+    // Show different content based on subscription status
+    If('subscription', 'premium', (subscription, element, parent) =>
+        Div({ class: "premium-features" }, [
+            P('Premium Features Available'),
+            Button('Advanced Analytics'),
+            Button('Priority Support')
+        ])
+    ),
+
+    If('subscription', 'basic', (subscription, element, parent) =>
+        Div({ class: "upgrade-prompt" }, [
+            P('Upgrade to Premium for more features'),
+            Button('Upgrade Now')
+        ])
+    )
+])
+
+// IfState - specifically watches component state for exact matches
+Div({ class: "game-interface" }, [
+    IfState('gameStatus', 'playing', (status, element, parent) =>
+        Div({ class: "game-controls" }, [
+            Button('Pause Game'),
+            Button('Save Progress')
+        ])
+    ),
+
+    IfState('gameStatus', 'paused', (status, element, parent) =>
+        Div({ class: "pause-menu" }, [
+            Button('Resume Game'),
+            Button('Main Menu'),
+            Button('Quit Game')
+        ])
+    ),
+
+    IfState('gameStatus', 'gameOver', (status, element, parent) =>
+        Div({ class: "game-over" }, [
+            H2('Game Over!'),
+            P(`Final Score: ${parent.state.score}`),
+            Button('Play Again'),
+            Button('Main Menu')
+        ])
+    )
+])
+
+// If with custom data source
+Div({ class: "weather-widget" }, [
+    If(parent.weatherData, 'condition', 'sunny', (condition, element, parent) =>
+        Div({ class: "sunny-weather" }, [
+            Icon('sun'),
+            P('Perfect weather for outdoor activities!')
+        ])
+    )
+])
+```
+
 ### Use Parent Atom
 
 The UseParent atom allows for the parent component to be accessed in a child atom. This atom is useful when a child atom needs to access the parent component.
