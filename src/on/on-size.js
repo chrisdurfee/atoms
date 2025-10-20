@@ -128,9 +128,9 @@ const createResponsiveAtom = (targetBreakpoint) =>
 			// Check if current breakpoint meets the target requirement
 			if (matchesBreakpoint(currentBreakpoint, targetBreakpoint))
 			{
-				// Pass the current width to the callback for additional context
+				// Pass the current size to the callback for additional context
 				// @ts-ignore
-				return callback(parent);
+				return callback(sizeData.size, parent);
 			}
 
 			// Return null to prevent rendering when breakpoint doesn't match
