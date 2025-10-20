@@ -61,6 +61,8 @@ const createBooleanCallback = (callback, fallback = null) =>
 	return createEqualityCallback(callback, true, fallback);
 };
 
+
+
 /**
  * Generic factory for creating conditional rendering atoms.
  *
@@ -138,6 +140,8 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 		});
 	};
 };
+
+
 
 /**
  * This will set up the update layout function.
@@ -403,3 +407,7 @@ export const OnStateOpen = createLoadStyleAtom(
 	'open',
 	(callback) => createBooleanCallback(callback)
 );
+
+// Re-export responsive atoms from on-size.js for backward compatibility
+export { On2Xl, OnLg, OnMd, OnSm, OnXl, OnXs } from './on-size.js';
+
