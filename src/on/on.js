@@ -2,23 +2,141 @@ import { Builder, dataBinder } from "@base-framework/base";
 import { Comment as BaseComment } from "src/comment.js";
 
 /**
- * This will set a previous result.
- *
- * @private
- * @param {object} parent
- * @param {string} prop
- * @param {string} value
- * @param {object} result
- * @returns {*}
+ * Data source types for conditional rendering atoms.
  */
-const checkPreviousResult = (parent, prop, value, result) =>
+const DATA_SOURCES =
 {
-	if (!parent || !result)
-	{
-		return result;
-	}
+	PARENT: 'parent',
+	STATE: 'state',
+	ROUTE: 'route'
+};
 
-	return result;
+/**
+ * Gets the appropriate data source based on the type.
+ *
+ * @param {object} parent - The parent component
+ * @param {string} sourceType - The data source type
+ * @returns {object|null} The data source
+ */
+const getDataSource = (parent, sourceType) =>
+{
+	switch (sourceType)
+	{
+		case DATA_SOURCES.PARENT:
+			return getParentData(parent);
+		case DATA_SOURCES.STATE:
+			return parent.state;
+		case DATA_SOURCES.ROUTE:
+			return parent.route;
+		default:
+			return null;
+	}
+};
+
+/**
+ * Creates a conditional callback that only executes when the value equals the expected value.
+ *
+ * @param {function} callback - The callback to execute
+ * @param {*} expectedValue - The value to compare against
+ * @param {*} [fallback=null] - The fallback value when condition is not met
+ * @returns {function} The conditional callback
+ */
+const createEqualityCallback = (callback, expectedValue, fallback = null) =>
+{
+	return (value, ele, parent) =>
+	{
+		return (value === expectedValue) ? callback(value, ele, parent) : fallback;
+	};
+};
+
+/**
+ * Creates a conditional callback that only executes when the value is truthy.
+ *
+ * @param {function} callback - The callback to execute
+ * @param {*} [fallback=null] - The fallback value when condition is not met
+ * @returns {function} The conditional callback
+ */
+const createBooleanCallback = (callback, fallback = null) =>
+{
+	return createEqualityCallback(callback, true, fallback);
+};
+
+/**
+ * Generic factory for creating conditional rendering atoms.
+ *
+ * @param {string} dataSourceType - The type of data source to use
+ * @param {string|null} [defaultProp=null] - Default property name for this atom type
+ * @param {function|null} [callbackTransformer=null] - Function to transform the callback
+ * @returns {function} The atom factory function
+ */
+const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTransformer = null) =>
+{
+	return (...args) =>
+	{
+		const settings = [...args];
+		const callback = settings.pop();
+		if (typeof callback !== 'function')
+		{
+			return;
+		}
+
+		return Comment(
+		{
+			onCreated: (ele, parent) =>
+			{
+				// Auto-inject data source if not provided
+				if (settings.length < (defaultProp ? 1 : 2))
+				{
+					const data = getDataSource(parent, dataSourceType);
+					settings.unshift(data);
+				}
+
+				// Use default property if provided and not specified
+				const prop = defaultProp || settings[1];
+				const finalCallback = callbackTransformer ? callbackTransformer(callback, settings) : callback;
+
+				const update = updateLayout(finalCallback, ele, prop, parent);
+				dataBinder.watch(ele, settings[0], prop, update);
+			}
+		});
+	};
+};
+
+/**
+ * Special factory for OnLoad-style functions that have different argument patterns.
+ *
+ * @param {string} dataSourceType - The type of data source to use
+ * @param {string} prop - The property name to watch
+ * @param {function} callbackTransformer - Function to transform the callback
+ * @returns {function} The atom factory function
+ */
+const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
+{
+	return (...args) =>
+	{
+		const settings = [...args];
+		const callback = (typeof settings[0] === 'function') ? settings[0] : settings[1];
+		if (typeof callback !== 'function')
+		{
+			return;
+		}
+
+		return Comment(
+		{
+			onCreated: (ele, parent) =>
+			{
+				if (settings.length < 2 || typeof settings[0] === 'function')
+				{
+					const data = getDataSource(parent, dataSourceType);
+					settings.unshift(data);
+				}
+
+				const finalCallback = callbackTransformer(callback, settings);
+				const update = updateLayout(finalCallback, ele, prop, parent);
+				dataBinder.watch(ele, settings[0], prop, update);
+			}
+		});
+	};
 };
 
 /**
@@ -61,11 +179,6 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		{
 			Builder.removeNode(prevEle);
 		}
-
-		/**
-		 * This will set the previous result if needed.
-		 */
-		layout = checkPreviousResult(parent, prop, value, layout);
 
 		/**
 		 * This will build the layout and insert it after the
@@ -129,37 +242,7 @@ export const getParentData = (parent) =>
  *
  * @returns {object}
  */
-export const On = (...args) =>
-{
-	const settings = [...args];
-	const callBack = settings.pop();
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = getParentData(parent);
-				settings.unshift(data);
-			}
-
-			const update = updateLayout(callBack, ele, settings[1], parent);
-			dataBinder.watch(ele, settings[0], settings[1], update);
-		}
-	});
-};
+export const On = createConditionalAtom(DATA_SOURCES.PARENT);
 
 /**
  * This will create an on state tag.
@@ -175,33 +258,7 @@ export const On = (...args) =>
  *
  * @returns {object}
  */
-export const OnState = (...args) =>
-{
-	const settings = [...args];
-	const callBack = settings.pop();
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				const data = parent.state;
-				settings.unshift(data);
-			}
-
-			const update = updateLayout(callBack, ele, settings[1], parent);
-			dataBinder.watch(ele, settings[0], settings[1], update);
-		}
-	});
-};
+export const OnState = createConditionalAtom(DATA_SOURCES.STATE);
 
 /**
  * This will create an on route tag.
@@ -217,32 +274,7 @@ export const OnState = (...args) =>
  *
  * @returns {object}
  */
-export const OnRoute = (...args) =>
-{
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			const settings = [...args];
-			const callBack = settings.pop();
-			if (typeof callBack !== 'function')
-			{
-				return;
-			}
-
-			if (settings.length < 2)
-			{
-				settings.unshift(parent.route);
-			}
-
-			const update = updateLayout(callBack, ele, settings[1], parent);
-			dataBinder.watch(ele, settings[0], settings[1], update);
-		}
-	});
-};
+export const OnRoute = createConditionalAtom(DATA_SOURCES.ROUTE);
 
 /**
  * This will create an if data tag.
@@ -260,47 +292,11 @@ export const OnRoute = (...args) =>
  *
  * @returns {object}
  */
-export const If = (...args) =>
-{
-	const settings = [...args];
-	const callBack = settings.pop();
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 3)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = getParentData(parent);
-				settings.unshift(data);
-			}
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = settings[2];
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value === settingValue)? callBack(value, ele, parent) : null;
-			};
-
-			const update = updateLayout(updateCallback, ele, settings[1], parent);
-			dataBinder.watch(ele, settings[0], settings[1], update);
-		}
-	});
-};
+export const If = createConditionalAtom(
+	DATA_SOURCES.PARENT,
+	null,
+	(callback, settings) => createEqualityCallback(callback, settings[2])
+);
 
 /**
  * This will create an if state tag.
@@ -318,43 +314,11 @@ export const If = (...args) =>
  *
  * @returns {object}
  */
-export const IfState = (...args) =>
-{
-	const settings = [...args];
-	const callBack = settings.pop();
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 3)
-			{
-				const data = parent.state;
-				settings.unshift(data);
-			}
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = settings[2];
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value === settingValue)? callBack(value, ele, parent) : null;
-			};
-
-			const update = updateLayout(updateCallback, ele, settings[1], parent);
-			dataBinder.watch(ele, settings[0], settings[1], update);
-		}
-	});
-};
+export const IfState = createConditionalAtom(
+	DATA_SOURCES.STATE,
+	null,
+	(callback, settings) => createEqualityCallback(callback, settings[2])
+);
 
 /**
  * This will create an on load data tag.
@@ -370,53 +334,18 @@ export const IfState = (...args) =>
  *
  * @returns {object}
  */
-export const OnLoad = (...args) =>
-{
-	const settings = [...args];
-	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
-	if (typeof callBack !== 'function')
+export const OnLoad = createLoadStyleAtom(
+	DATA_SOURCES.PARENT,
+	'loaded',
+	(callback, settings) =>
 	{
-		return;
+		const notLoaded = (settings.length === 3) ? settings[2] : null;
+		return createBooleanCallback(callback, notLoaded);
 	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = getParentData(parent);
-				settings.unshift(data);
-			}
-
-			const notLoaded = (settings.length === 3)? settings[2] : null;
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = true;
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
-			};
-
-			const prop = 'loaded';
-			const update = updateLayout(updateCallback, ele, prop, parent);
-			dataBinder.watch(ele, settings[0], prop, update);
-		}
-	});
-};
+);
 
 /**
- * This will create an on load data tag.
+ * This will create an on state load tag.
  *
  * @overload
  * @param {object} data
@@ -429,165 +358,48 @@ export const OnLoad = (...args) =>
  *
  * @returns {object}
  */
-export const OnStateLoad = (...args) =>
-{
-	const settings = [...args];
-	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
-	if (typeof callBack !== 'function')
+export const OnStateLoad = createLoadStyleAtom(
+	DATA_SOURCES.STATE,
+	'loaded',
+	(callback, settings) =>
 	{
-		return;
+		const notLoaded = (settings.length === 3) ? settings[2] : null;
+		return createBooleanCallback(callback, notLoaded);
 	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = parent.state;
-				settings.unshift(data);
-			}
-
-			const notLoaded = (settings.length === 3)? settings[2] : null;
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = true;
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value === settingValue)? callBack(value, ele, parent) : notLoaded;
-			};
-
-			const prop = 'loaded';
-			const update = updateLayout(updateCallback, ele, prop, parent);
-			dataBinder.watch(ele, settings[0], prop, update);
-		}
-	});
-};
+);
 
 /**
- * This will create an on load data tag.
+ * This will create an on open data tag.
  *
  * @overload
  * @param {object} data
  * @param {function} callBack
- * @param {function|object|null} [notLoaded=null]
  *
  * @overload
  * @param {function} callBack
- * @param {function|object|null} [notLoaded=null]
  *
  * @returns {object}
  */
-export const OnOpen = (...args) =>
-{
-	const settings = [...args];
-	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = getParentData(parent);
-				settings.unshift(data);
-			}
-
-			const notOpen = null;
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = true;
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value == settingValue)? callBack(value, ele, parent) : notOpen;
-			};
-
-			const prop = 'open';
-			const update = updateLayout(updateCallback, ele, prop, parent);
-			dataBinder.watch(ele, settings[0], prop, update);
-		}
-	});
-};
+export const OnOpen = createLoadStyleAtom(
+	DATA_SOURCES.PARENT,
+	'open',
+	(callback) => createBooleanCallback(callback)
+);
 
 /**
- * This will create an on load data tag.
+ * This will create an on state open tag.
  *
  * @overload
  * @param {object} data
  * @param {function} callBack
- * @param {function|object|null} [notLoaded=null]
  *
  * @overload
  * @param {function} callBack
- * @param {function|object|null} [notLoaded=null]
  *
  * @returns {object}
  */
-export const OnStateOpen = (...args) =>
-{
-	const settings = [...args];
-	const callBack = (typeof settings[0] === 'function') ? settings[0] : settings[1];
-	if (typeof callBack !== 'function')
-	{
-		return;
-	}
-
-	/**
-	 * This will create a comment to use as a placeholder
-	 * to keep the layout in place.
-	 */
-	return Comment({
-		onCreated: (ele, parent) =>
-		{
-			if (settings.length < 2)
-			{
-				/**
-				 * This will get the parent data and add it to the
-				 * settings array.
-				 */
-				const data = parent.state;
-				settings.unshift(data);
-			}
-
-			const notOpen = null;
-
-			/**
-			 * This will check if the value is set and
-			 * if it matches the setting value.
-			 */
-			const settingValue = true;
-			const updateCallback = (value, ele, parent) =>
-			{
-				return (value == settingValue)? callBack(value, ele, parent) : notOpen;
-			};
-
-			const prop = 'open';
-			const update = updateLayout(updateCallback, ele, prop, parent);
-			dataBinder.watch(ele, settings[0], prop, update);
-		}
-	});
-};
+export const OnStateOpen = createLoadStyleAtom(
+	DATA_SOURCES.STATE,
+	'open',
+	(callback) => createBooleanCallback(callback)
+);
