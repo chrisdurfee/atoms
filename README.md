@@ -367,6 +367,121 @@ UseParent((parent) =>
 })
 ```
 
+### Responsive Breakpoint Atoms
+
+The responsive breakpoint atoms provide Tailwind CSS-like mobile-first responsive rendering. These atoms conditionally render content based on the current window size, following the mobile-first approach where each breakpoint renders when the screen size matches OR is larger.
+
+#### Available Breakpoint Atoms
+
+- `OnXs` - 0px+ (always renders, useful for mobile-only content)
+- `OnSm` - 640px+ (small devices and larger)
+- `OnMd` - 768px+ (medium devices and larger)
+- `OnLg` - 1024px+ (large devices and larger)
+- `OnXl` - 1280px+ (extra large devices and larger)
+- `On2Xl` - 1536px+ (2x extra large devices and larger)
+
+#### Usage Examples
+
+```javascript
+// Mobile-first navigation - show different nav styles for different screen sizes
+Div({ class: "navigation" }, [
+    // Mobile navigation (always shows on xs, hidden on sm+)
+    OnXs(() =>
+        Div({ class: "mobile-nav" }, [
+            Button({ class: "hamburger" }, '☰'),
+            Div({ class: "mobile-menu hidden" }, [
+                A({ href: "/home" }, 'Home'),
+                A({ href: "/about" }, 'About')
+            ])
+        ])
+    ),
+
+    // Tablet and desktop navigation (shows on md+)
+    OnMd(() =>
+        Nav({ class: "desktop-nav" }, [
+            Ul({ class: "flex space-x-4" }, [
+                Li(A({ href: "/home" }, 'Home')),
+                Li(A({ href: "/about" }, 'About')),
+                Li(A({ href: "/contact" }, 'Contact'))
+            ])
+        ])
+    )
+])
+
+// Responsive grid layouts
+Div({ class: "content-area" }, [
+    // Mobile layout (1 column)
+    OnSm(() =>
+        Div({ class: "grid grid-cols-1 gap-4" }, [
+            Card({ title: "Mobile Card 1" }),
+            Card({ title: "Mobile Card 2" })
+        ])
+    ),
+
+    // Desktop layout (3 columns)
+    OnLg(() =>
+        Div({ class: "grid grid-cols-3 gap-6" }, [
+            Card({ title: "Desktop Card 1" }),
+            Card({ title: "Desktop Card 2" }),
+            Card({ title: "Desktop Card 3" })
+        ])
+    )
+])
+
+// Access current window width in callback
+OnXl((width, element, parent) => {
+    return Div({ class: "analytics-panel" }, [
+        H2('Large Screen Analytics'),
+        P(`Screen width: ${width}px`),
+        Chart({ width: width - 100 })
+    ]);
+})
+
+// Conditional content based on screen size
+Div({ class: "hero-section" }, [
+    H1('Welcome'),
+
+    // Show detailed hero content only on larger screens
+    OnLg(() =>
+        Div({ class: "hero-details" }, [
+            P('Detailed description with more information...'),
+            Button({ class: "cta-large" }, 'Get Started Today')
+        ])
+    ),
+
+    // Show simplified content on smaller screens
+    OnSm(() =>
+        Button({ class: "cta-mobile" }, 'Start')
+    )
+])
+```
+
+#### How Responsive Atoms Work
+
+The responsive atoms use a global Data object that tracks the current window size and breakpoint. When the window is resized:
+
+1. The window width is measured
+2. The appropriate breakpoint name is determined (xs, sm, md, lg, xl, 2xl)
+3. The global `sizeData.size` property is updated
+4. All responsive atoms automatically re-evaluate and show/hide content accordingly
+
+This system provides:
+- **Efficient Performance**: Single global resize listener for all responsive atoms
+- **Mobile-First**: Each breakpoint shows on matching size AND larger (Tailwind approach)
+- **Automatic Cleanup**: No memory leaks, listeners are properly managed
+- **SSR Safe**: Works in server-side rendering environments
+
+#### Breakpoint Reference
+
+| Breakpoint | Min Width | CSS Equivalent | Use Case |
+|------------|-----------|----------------|----------|
+| OnXs       | 0px       | (always)       | Mobile phones |
+| OnSm       | 640px     | @media (min-width: 640px) | Large phones, small tablets |
+| OnMd       | 768px     | @media (min-width: 768px) | Tablets |
+| OnLg       | 1024px    | @media (min-width: 1024px) | Laptops, desktops |
+| OnXl       | 1280px    | @media (min-width: 1280px) | Large desktops |
+| On2Xl      | 1536px    | @media (min-width: 1536px) | Extra large screens |
+
 ## Contributing
 
 Contributions to Base Framework are welcome. Follow these steps to contribute:
