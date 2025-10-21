@@ -482,6 +482,100 @@ This system provides:
 | OnXl       | 1280px    | @media (min-width: 1280px) | Large desktops |
 | On2Xl      | 1536px    | @media (min-width: 1536px) | Extra large screens |
 
+#### Semantic Device Atoms
+
+For simplified responsive design, use semantic device atoms that group breakpoints logically:
+
+- `OnPhone` - Phone-sized devices (xs + sm: 0-767px)
+- `OnTablet` - Tablet-sized devices (md: 768-1023px)
+- `OnDesktop` - Desktop-sized devices (lg + xl + 2xl: 1024px+)
+
+```javascript
+// Clean semantic responsive layout
+Div({ class: "app-layout" }, [
+    // Mobile layout for phones
+    OnPhone(() =>
+        Div({ class: "mobile-stack" }, [
+            MobileHeader(),
+            MobileNav(),
+            MobileContent()
+        ])
+    ),
+
+    // Tablet layout
+    OnTablet(() =>
+        Div({ class: "tablet-grid" }, [
+            TabletHeader(),
+            Div({ class: "tablet-columns" }, [
+                TabletSidebar(),
+                TabletContent()
+            ])
+        ])
+    ),
+
+    // Desktop layout
+    OnDesktop(() =>
+        Div({ class: "desktop-layout" }, [
+            DesktopHeader(),
+            Div({ class: "desktop-main" }, [
+                DesktopSidebar(),
+                DesktopContent(),
+                DesktopAside()
+            ])
+        ])
+    )
+])
+```
+
+#### Exact Breakpoint Atoms
+
+For precise control, use exact breakpoint atoms that only render on specific screen sizes:
+
+- `OnXsOnly` - Only xs (0-639px)
+- `OnSmOnly` - Only sm (640-767px)
+- `OnMdOnly` - Only md (768-1023px)
+- `OnLgOnly` - Only lg (1024-1279px)
+- `OnXlOnly` - Only xl (1280-1535px)
+- `On2XlOnly` - Only 2xl (1536px+)
+
+```javascript
+// Precise breakpoint targeting
+Div({ class: "responsive-banner" }, [
+    // Different banner for each exact screen size
+    OnXsOnly(() =>
+        Div({ class: "xs-banner" }, "Optimized for small phones")
+    ),
+
+    OnSmOnly(() =>
+        Div({ class: "sm-banner" }, "Perfect for large phones")
+    ),
+
+    OnMdOnly(() =>
+        Div({ class: "md-banner" }, "Great tablet experience")
+    ),
+
+    OnLgOnly(() =>
+        Div({ class: "lg-banner" }, "Desktop ready")
+    ),
+
+    OnXlOnly(() =>
+        Div({ class: "xl-banner" }, "Large screen optimized")
+    ),
+
+    On2XlOnly(() =>
+        Div({ class: "2xl-banner" }, "Ultra-wide display")
+    )
+])
+```
+
+#### Responsive Atom Comparison
+
+| Type | Behavior | Use Case |
+|------|----------|----------|
+| **Mobile-First** (`OnSm`, `OnMd`, etc.) | Shows on breakpoint AND larger | Progressive enhancement, adding features for larger screens |
+| **Semantic** (`OnPhone`, `OnTablet`, `OnDesktop`) | Shows only on device category | Clean device-specific layouts |
+| **Exact** (`OnSmOnly`, `OnMdOnly`, etc.) | Shows only on specific breakpoint | Precise responsive control, unique layouts per size |
+
 ## Contributing
 
 Contributions to Base Framework are welcome. Follow these steps to contribute:

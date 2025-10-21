@@ -409,5 +409,5 @@ export const OnStateOpen = createLoadStyleAtom(
 );
 
 // Re-export responsive atoms from on-size.js for backward compatibility
-export { On2Xl, OnLg, OnMd, OnSm, OnXl, OnXs } from './on-size.js';
+export { On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnMd, OnMdOnly, OnPhone, OnSm, OnSmOnly, OnTablet, OnXl, OnXlOnly, OnXs, OnXsOnly } from './on-size.js';
 

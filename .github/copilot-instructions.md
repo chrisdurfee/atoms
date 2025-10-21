@@ -37,16 +37,32 @@ Located in `/src/on/` and `/src/use/` directories:
 
 - **On Atoms**: Conditional rendering based on data binding (`On`, `OnState`, `OnRoute`)
 - **Responsive Atoms**: Mobile-first breakpoint rendering (`OnXs`, `OnSm`, `OnMd`, `OnLg`, `OnXl`, `On2Xl`)
+- **Semantic Device Atoms**: Device-category responsive rendering (`OnPhone`, `OnTablet`, `OnDesktop`)
+- **Exact Breakpoint Atoms**: Precise breakpoint targeting (`OnXsOnly`, `OnSmOnly`, `OnMdOnly`, `OnLgOnly`, `OnXlOnly`, `On2XlOnly`)
 - **UseParent**: Provides access to parent component context
 - Use **comment placeholders** to maintain DOM position during dynamic updates
 
 #### Responsive Breakpoint System
-The responsive atoms (`OnXs`, `OnSm`, `OnMd`, `OnLg`, `OnXl`, `On2Xl`) use a Data-based size tracking system:
+The responsive atoms use a Data-based size tracking system with multiple rendering approaches:
 
+**Mobile-First Atoms** (`OnXs`, `OnSm`, `OnMd`, `OnLg`, `OnXl`, `On2Xl`):
 - Global `sizeData` object tracks current breakpoint and window width
 - Single resize listener updates all responsive atoms efficiently
 - Mobile-first approach: each breakpoint renders on matching size AND larger
 - Tailwind CSS compatible breakpoints (640px, 768px, 1024px, 1280px, 1536px)
+
+**Semantic Device Atoms** (`OnPhone`, `OnTablet`, `OnDesktop`):
+- `OnPhone`: Renders on xs + sm breakpoints (0-767px) for phone-sized devices
+- `OnTablet`: Renders on md breakpoint (768-1023px) for tablet-sized devices
+- `OnDesktop`: Renders on lg + xl + 2xl breakpoints (1024px+) for desktop-sized devices
+- Cleaner API for device-specific layouts without breakpoint logic
+
+**Exact Breakpoint Atoms** (`OnXsOnly`, `OnSmOnly`, etc.):
+- Each atom renders only on its specific breakpoint range
+- Precise control for unique layouts per screen size
+- Useful for fine-tuned responsive designs
+
+All responsive systems:
 - Located in `/src/on/on-size.js` with re-exports in `/src/on/on.js`
 
 ## Development Workflows
@@ -107,6 +123,11 @@ Atoms support multiple call patterns:
 - Mobile-first rendering: each breakpoint shows on current size AND larger
 - Automatic cleanup prevents memory leaks when components unmount
 - Server-side rendering safe with window existence checks
+
+**When to use each responsive atom type:**
+- **Mobile-First atoms** (`OnSm`, `OnMd`, etc.): Progressive enhancement, adding features for larger screens
+- **Semantic atoms** (`OnPhone`, `OnTablet`, `OnDesktop`): Clean device-specific layouts without breakpoint logic
+- **Exact atoms** (`OnSmOnly`, `OnMdOnly`, etc.): Precise responsive control when you need unique layouts per screen size
 
 ### Base Framework Integration
 - Always import `Atom` from `@base-framework/base`

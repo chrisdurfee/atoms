@@ -199,8 +199,144 @@ export const On2Xl = createResponsiveAtom('2xl');
 export { sizeData };
 
 /**
+ * Factory for creating exact breakpoint atoms (only renders on specific size).
+ *
+ * @param {string} targetBreakpoint - The exact breakpoint name
+ * @returns {function} The exact responsive atom factory function
+ */
+const createExactBreakpointAtom = (targetBreakpoint) =>
+{
+	return (callback) =>
+	{
+		if (typeof callback !== 'function')
+		{
+			return;
+		}
+
+		// Use the On atom to watch the sizeData.size property
+		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
+		{
+			// Only render if current breakpoint exactly matches target
+			if (currentBreakpoint === targetBreakpoint)
+			{
+				return callback(currentBreakpoint, parent);
+			}
+
+			// Return null to prevent rendering when breakpoint doesn't match
+			return null;
+		});
+	};
+};
+
+/**
+ * Renders only on xs breakpoint (0-639px).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnXsOnly = createExactBreakpointAtom('xs');
+
+/**
+ * Renders only on sm breakpoint (640-767px).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnSmOnly = createExactBreakpointAtom('sm');
+
+/**
+ * Renders only on md breakpoint (768-1023px).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnMdOnly = createExactBreakpointAtom('md');
+
+/**
+ * Renders only on lg breakpoint (1024-1279px).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnLgOnly = createExactBreakpointAtom('lg');
+
+/**
+ * Renders only on xl breakpoint (1280-1535px).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnXlOnly = createExactBreakpointAtom('xl');
+
+/**
+ * Renders only on 2xl breakpoint (1536px+).
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const On2XlOnly = createExactBreakpointAtom('2xl');
+
+/**
+ * Factory for creating semantic device breakpoint atoms.
+ *
+ * @param {string[]} targetBreakpoints - Array of breakpoint names that match this device
+ * @returns {function} The semantic responsive atom factory function
+ */
+const createSemanticBreakpointAtom = (targetBreakpoints) =>
+{
+	return (callback) =>
+	{
+		if (typeof callback !== 'function')
+		{
+			return;
+		}
+
+		// Use the On atom to watch the sizeData.size property
+		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
+		{
+			// Check if current breakpoint is in the target breakpoints array
+			if (targetBreakpoints.includes(currentBreakpoint))
+			{
+				// @ts-ignore - Data class supports proxy access
+				return callback(sizeData.size, parent);
+			}
+
+			// Return null to prevent rendering when breakpoint doesn't match
+			return null;
+		});
+	};
+};
+
+/**
+ * Renders on phone-sized devices (xs and sm breakpoints: 0-767px).
+ * Includes extra small and small devices.
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnPhone = createSemanticBreakpointAtom(['xs', 'sm']);
+
+/**
+ * Renders on tablet-sized devices (md breakpoint: 768-1023px).
+ * Includes medium devices.
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnTablet = createSemanticBreakpointAtom(['md']);
+
+/**
+ * Renders on desktop-sized devices (lg, xl, 2xl breakpoints: 1024px+).
+ * Includes large, extra large, and 2x extra large devices.
+ *
+ * @param {function} callback - The callback function to render the layout
+ * @returns {object} The responsive atom
+ */
+export const OnDesktop = createSemanticBreakpointAtom(['lg', 'xl', '2xl']);
+
+/**
  * Export cleanup function for testing or manual cleanup.
  */
-	export { cleanup as cleanupSizeTracker };
+export { cleanup as cleanupSizeTracker };
 
 

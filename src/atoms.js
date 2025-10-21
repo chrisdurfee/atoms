@@ -1,7 +1,7 @@
 import { Atom } from '@base-framework/base';
-import { If, IfState, On, On2Xl, OnLg, OnLoad, OnMd, OnOpen, OnRoute, OnSm, OnState, OnStateLoad, OnStateOpen, OnXl, OnXs } from './on/on.js';
+import { If, IfState, On, On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnLoad, OnMd, OnMdOnly, OnOpen, OnPhone, OnRoute, OnSm, OnSmOnly, OnState, OnStateLoad, OnStateOpen, OnTablet, OnXl, OnXlOnly, OnXs, OnXsOnly } from './on/on.js';
 import { UseParent } from './use/use.js';
-export { If, IfState, On, On2Xl, OnLg, OnLoad, OnMd, OnOpen, OnRoute, OnSm, OnState, OnStateLoad, OnStateOpen, OnXl, OnXs, UseParent };
+export { If, IfState, On, On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnLoad, OnMd, OnMdOnly, OnOpen, OnPhone, OnRoute, OnSm, OnSmOnly, OnState, OnStateLoad, OnStateOpen, OnTablet, OnXl, OnXlOnly, OnXs, OnXsOnly, UseParent };
 
 /**
  * Creates a generic HTML tag.
