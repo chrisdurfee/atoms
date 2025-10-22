@@ -7,5 +7,6 @@
 export const Comment = (props) => ({
     tag: 'comment',
     textContent: `${props.type} placeholder`,
-    onCreated: props.onCreated
+    onCreated: props.onCreated,
+    onDestroyed: props.onDestroyed
 });

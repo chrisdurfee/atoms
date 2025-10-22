@@ -61,8 +61,6 @@ const createBooleanCallback = (callback, fallback = null) =>
 	return createEqualityCallback(callback, true, fallback);
 };
 
-
-
 /**
  * Generic factory for creating conditional rendering atoms.
  *
@@ -141,8 +139,6 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 	};
 };
 
-
-
 /**
  * This will set up the update layout function.
  *
@@ -155,14 +151,6 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 const updateLayout = (callBack, ele, prop, parent) =>
 {
 	/**
-	 * This will hold the previous child element to
-	 * help remove it when updating.
-	 *
-	 * @type {(object|null)} prevEle
-	 */
-	let prevEle = null;
-
-	/**
 	 * This will update the layout.
 	 *
 	 * @param {object} value
@@ -170,6 +158,15 @@ const updateLayout = (callBack, ele, prop, parent) =>
 	 */
 	return (value) =>
 	{
+		/**
+		 * This will remove the previous element if it exists.
+		 */
+		if (ele._prevEle)
+		{
+			Builder.removeNode(ele._prevEle);
+			ele._prevEle = null;
+		}
+
 		let layout = callBack(value, ele, parent);
 		if (layout === undefined)
 		{
@@ -177,19 +174,11 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		}
 
 		/**
-		 * This will remove the previous element if it exists.
-		 */
-		if (prevEle)
-		{
-			Builder.removeNode(prevEle);
-		}
-
-		/**
 		 * This will build the layout and insert it after the
 		 * comment element.
 		 */
 		const frag = Builder.build(layout, null, parent);
-		prevEle = frag.children[0];
+		ele._prevEle = frag.childNodes[0];
 
 		ele.parentNode.insertBefore(frag, ele.nextSibling);
 	};
@@ -203,7 +192,15 @@ const updateLayout = (callBack, ele, prop, parent) =>
  */
 const Comment = (props) => BaseComment({
 	type: 'on',
-	onCreated: props.onCreated
+	onCreated: props.onCreated,
+	onDestroyed: (ele) =>
+	{
+		if (ele._prevEle)
+		{
+			Builder.removeNode(ele._prevEle);
+			ele._prevEle = null;
+		}
+	}
 });
 
 /**
