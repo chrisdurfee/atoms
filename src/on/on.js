@@ -1,5 +1,5 @@
 import { Builder, dataBinder } from "@base-framework/base";
-import { Comment as BaseComment } from "src/comment.js";
+import { Comment as BaseComment } from "../comment.js";
 
 /**
  * Data source types for conditional rendering atoms.

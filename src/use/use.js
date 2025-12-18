@@ -1,5 +1,5 @@
 import { Builder } from "@base-framework/base";
-import { Comment as BaseComment } from "src/comment.js";
+import { Comment as BaseComment } from "../comment.js";
 
 /**
  * This will set up the update layout function.
