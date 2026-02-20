@@ -1,6 +1,6 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
@@ -41,6 +41,7 @@
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
+			"types": "./dist/types/atoms.d.ts",
 			"import": "./dist/atoms.js",
 			"require": "./dist/atoms.js"
 		},
