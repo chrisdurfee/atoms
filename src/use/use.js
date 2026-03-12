@@ -7,7 +7,7 @@ import { Comment as BaseComment } from "../comment.js";
  * @param {function} callBack
  * @param {object} ele
  * @param {object} parent
- * @returns {function|undefined}
+ * @returns {void}
  */
 const updateLayout = (callBack, ele, parent) =>
 {
