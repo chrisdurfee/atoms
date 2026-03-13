@@ -21,7 +21,7 @@ const updateLayout = (callBack, ele, parent) =>
 	}
 
 	const layout = callBack(parent);
-	if (layout === undefined)
+	if (layout == null)
 	{
 		return;
 	}
@@ -63,6 +63,11 @@ const Comment = (props) => BaseComment({
  */
 export const UseParent = (callBack) =>
 {
+	if (typeof callBack !== 'function')
+	{
+		return null;
+	}
+
 	/**
 	 * This will create a comment to use as a placeholder
 	 * to keep the layout in place.

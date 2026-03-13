@@ -67,9 +67,10 @@ const createBooleanCallback = (callback, fallback = null) =>
  * @param {string} dataSourceType - The type of data source to use
  * @param {string|null} [defaultProp=null] - Default property name for this atom type
  * @param {function|null} [callbackTransformer=null] - Function to transform the callback
+ * @param {number} [requiredArgs=2] - Number of args (excluding callback) that indicate data source was provided
  * @returns {function} The atom factory function
  */
-const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTransformer = null) =>
+const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTransformer = null, requiredArgs = 2) =>
 {
 	return (...args) =>
 	{
@@ -77,26 +78,28 @@ const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTrans
 		const callback = settings.pop();
 		if (typeof callback !== 'function')
 		{
-			return;
+			return null;
 		}
 
 		return Comment(
 		{
 			onCreated: (ele, parent) =>
 			{
+				const localSettings = [...settings];
+
 				// Auto-inject data source if not provided
-				if (settings.length < (defaultProp ? 1 : 2))
+				if (localSettings.length < requiredArgs)
 				{
 					const data = getDataSource(parent, dataSourceType);
-					settings.unshift(data);
+					localSettings.unshift(data);
 				}
 
 				// Use default property if provided and not specified
-				const prop = defaultProp || settings[1];
-				const finalCallback = callbackTransformer ? callbackTransformer(callback, settings) : callback;
+				const prop = defaultProp || localSettings[1];
+				const finalCallback = callbackTransformer ? callbackTransformer(callback, localSettings) : callback;
 
 				const update = updateLayout(finalCallback, ele, prop, parent);
-				dataBinder.watch(ele, settings[0], prop, update);
+				dataBinder.watch(ele, localSettings[0], prop, update);
 			}
 		});
 	};
@@ -118,22 +121,24 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 		const callback = (typeof settings[0] === 'function') ? settings[0] : settings[1];
 		if (typeof callback !== 'function')
 		{
-			return;
+			return null;
 		}
 
 		return Comment(
 		{
 			onCreated: (ele, parent) =>
 			{
-				if (settings.length < 2 || typeof settings[0] === 'function')
+				const localSettings = [...settings];
+
+				if (localSettings.length < 2 || typeof localSettings[0] === 'function')
 				{
 					const data = getDataSource(parent, dataSourceType);
-					settings.unshift(data);
+					localSettings.unshift(data);
 				}
 
-				const finalCallback = callbackTransformer(callback, settings);
+				const finalCallback = callbackTransformer(callback, localSettings);
 				const update = updateLayout(finalCallback, ele, prop, parent);
-				dataBinder.watch(ele, settings[0], prop, update);
+				dataBinder.watch(ele, localSettings[0], prop, update);
 			}
 		});
 	};
@@ -168,7 +173,7 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		}
 
 		let layout = callBack(value, ele, parent);
-		if (layout === undefined)
+		if (layout == null)
 		{
 			return;
 		}
@@ -296,7 +301,8 @@ export const OnRoute = createConditionalAtom(DATA_SOURCES.ROUTE);
 export const If = createConditionalAtom(
 	DATA_SOURCES.PARENT,
 	null,
-	(callback, settings) => createEqualityCallback(callback, settings[2])
+	(callback, settings) => createEqualityCallback(callback, settings[2]),
+	3
 );
 
 /**
@@ -318,7 +324,8 @@ export const If = createConditionalAtom(
 export const IfState = createConditionalAtom(
 	DATA_SOURCES.STATE,
 	null,
-	(callback, settings) => createEqualityCallback(callback, settings[2])
+	(callback, settings) => createEqualityCallback(callback, settings[2]),
+	3
 );
 
 /**

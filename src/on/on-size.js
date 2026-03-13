@@ -119,7 +119,7 @@ const createResponsiveAtom = (targetBreakpoint) =>
 	{
 		if (typeof callback !== 'function')
 		{
-			return;
+			return null;
 		}
 
 		// Use the On atom to watch the sizeData.size property
@@ -210,7 +210,7 @@ const createExactBreakpointAtom = (targetBreakpoint) =>
 	{
 		if (typeof callback !== 'function')
 		{
-			return;
+			return null;
 		}
 
 		// Use the On atom to watch the sizeData.size property
@@ -288,7 +288,7 @@ const createSemanticBreakpointAtom = (targetBreakpoints) =>
 	{
 		if (typeof callback !== 'function')
 		{
-			return;
+			return null;
 		}
 
 		// Use the On atom to watch the sizeData.size property
