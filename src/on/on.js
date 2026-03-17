@@ -145,6 +145,14 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 };
 
 /**
+ * Checks if a value is a non-null object (including arrays).
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+const isObject = (value) => value !== null && typeof value === 'object';
+
+/**
  * This will set up the update layout function.
  *
  * @param {function} callBack
@@ -156,6 +164,16 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 const updateLayout = (callBack, ele, prop, parent) =>
 {
 	/**
+	 * @type {*} lastValue - Tracks the last rendered value to
+	 * skip redundant updates for primitive values. This prevents
+	 * the duplicate initial render caused by dataBinder.watch()
+	 * calling the callback immediately while the Data constructor's
+	 * publish is still queued in the microtask. If that duplicate
+	 * render throws, it can permanently break the DataPubSub flush.
+	 */
+	let lastValue;
+
+	/**
 	 * This will update the layout.
 	 *
 	 * @param {object} value
@@ -163,6 +181,17 @@ const updateLayout = (callBack, ele, prop, parent) =>
 	 */
 	return (value) =>
 	{
+		/**
+		 * Skip redundant updates for the same primitive value.
+		 * Object values (arrays, objects) always pass through
+		 * since their contents may have changed.
+		 */
+		if (value === lastValue && !isObject(value))
+		{
+			return;
+		}
+		lastValue = value;
+
 		/**
 		 * This will remove the previous element if it exists.
 		 */
@@ -174,6 +203,16 @@ const updateLayout = (callBack, ele, prop, parent) =>
 
 		let layout = callBack(value, ele, parent);
 		if (layout == null)
+		{
+			return;
+		}
+
+		/**
+		 * Guard against the comment element being detached
+		 * from the DOM (e.g. parent was removed during an
+		 * update cycle).
+		 */
+		if (!ele.parentNode)
 		{
 			return;
 		}
