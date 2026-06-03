@@ -8,6 +8,7 @@
 		"prepublishOnly": "node ./esbuild.js"
 	},
 	"type": "module",
+	"sideEffects": false,
 	"keywords": [
 		"JavaScript",
 		"Framework",
@@ -36,7 +37,8 @@
 		"package.json",
 		"readme.md",
 		"dist",
-		"copilot.md"
+		"copilot.md",
+		"!dist/**/*.map"
 	],
 	"exports": {
 		"./package.json": "./package.json",
