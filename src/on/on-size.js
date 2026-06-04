@@ -53,6 +53,22 @@ const sizeData = new Data({
 });
 
 /**
+ * Tracks whether the size system has been initialized to avoid
+ * registering more than one resize listener.
+ *
+ * @type {boolean}
+ */
+let isInitialized = false;
+
+/**
+ * Holds the cleanup function returned by the size tracker once it has
+ * been initialized, so it can be invoked for manual teardown or tests.
+ *
+ * @type {(() => void)|null}
+ */
+let cleanup = null;
+
+/**
  * Initialize the size tracking system.
  */
 const initializeSizeTracker = () =>
@@ -100,12 +116,24 @@ const initializeSizeTracker = () =>
 	};
 };
 
-// Initialize the tracker immediately
-let cleanup = null;
-if (typeof window !== 'undefined')
+/**
+ * Lazily initializes the size tracker the first time a responsive
+ * atom is created. This keeps the module side-effect free at import
+ * time, so apps that never use a responsive atom never register a
+ * resize listener or create the size Data object.
+ *
+ * @returns {void}
+ */
+const ensureSizeTracker = () =>
 {
-	cleanup = initializeSizeTracker();
-}
+	if (isInitialized)
+	{
+		return;
+	}
+
+	isInitialized = true;
+	cleanup = initializeSizeTracker() || null;
+};
 
 /**
  * Factory for creating responsive breakpoint atoms.
@@ -121,6 +149,8 @@ const createResponsiveAtom = (targetBreakpoint) =>
 		{
 			return null;
 		}
+
+		ensureSizeTracker();
 
 		// Use the On atom to watch the sizeData.size property
 		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
@@ -213,6 +243,8 @@ const createExactBreakpointAtom = (targetBreakpoint) =>
 			return null;
 		}
 
+		ensureSizeTracker();
+
 		// Use the On atom to watch the sizeData.size property
 		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
 		{
@@ -290,6 +322,8 @@ const createSemanticBreakpointAtom = (targetBreakpoints) =>
 		{
 			return null;
 		}
+
+		ensureSizeTracker();
 
 		// Use the On atom to watch the sizeData.size property
 		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>

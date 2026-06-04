@@ -1,11 +1,11 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
 		"build": "node ./esbuild.js && tsc",
-		"prepublishOnly": "node ./esbuild.js"
+		"prepublishOnly": "node ./esbuild.js && tsc"
 	},
 	"type": "module",
 	"sideEffects": false,
@@ -46,6 +46,16 @@
 			"types": "./dist/types/atoms.d.ts",
 			"import": "./dist/atoms.js",
 			"require": "./dist/atoms.js"
+		},
+		"./on": {
+			"types": "./dist/types/on/on.d.ts",
+			"import": "./dist/on/on.js",
+			"require": "./dist/on/on.js"
+		},
+		"./use": {
+			"types": "./dist/types/use/use.d.ts",
+			"import": "./dist/use/use.js",
+			"require": "./dist/use/use.js"
 		},
 		"./copilot.md": "./copilot.md"
 	},
