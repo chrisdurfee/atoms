@@ -73,11 +73,6 @@ let cleanup = null;
  */
 const initializeSizeTracker = () =>
 {
-	if (typeof window === 'undefined')
-	{
-		return;
-	}
-
 	// Set initial values
 	const currentWidth = window.innerWidth;
 	const currentBreakpoint = getBreakpointName(currentWidth);
@@ -87,23 +82,37 @@ const initializeSizeTracker = () =>
 	// @ts-ignore
 	sizeData.width = currentWidth;
 
+	let rafId = null;
+
 	/**
-	 * Handle window resize events.
+	 * Handle window resize events. Updates are throttled with
+	 * requestAnimationFrame and only published when the breakpoint
+	 * actually changes, so resizing doesn't flood the data pub/sub
+	 * with per-pixel updates.
 	 */
 	const handleResize = () =>
 	{
-		const newWidth = window.innerWidth;
-		const newBreakpoint = getBreakpointName(newWidth);
-
-		// Only update if the breakpoint or width actually changed
-		// @ts-ignore
-		if (newWidth !== sizeData.width || newBreakpoint !== sizeData.size)
+		if (rafId !== null)
 		{
-			// @ts-ignore
-			sizeData.width = newWidth;
-			// @ts-ignore
-			sizeData.size = newBreakpoint;
+			return;
 		}
+
+		rafId = window.requestAnimationFrame(() =>
+		{
+			rafId = null;
+
+			const newWidth = window.innerWidth;
+			const newBreakpoint = getBreakpointName(newWidth);
+
+			// @ts-ignore
+			if (newBreakpoint !== sizeData.size)
+			{
+				// @ts-ignore
+				sizeData.width = newWidth;
+				// @ts-ignore
+				sizeData.size = newBreakpoint;
+			}
+		});
 	};
 
 	// Add resize listener
@@ -112,6 +121,11 @@ const initializeSizeTracker = () =>
 	// Return cleanup function
 	return () =>
 	{
+		if (rafId !== null)
+		{
+			window.cancelAnimationFrame(rafId);
+			rafId = null;
+		}
 		window.removeEventListener('resize', handleResize);
 	};
 };
@@ -120,28 +134,33 @@ const initializeSizeTracker = () =>
  * Lazily initializes the size tracker the first time a responsive
  * atom is created. This keeps the module side-effect free at import
  * time, so apps that never use a responsive atom never register a
- * resize listener or create the size Data object.
+ * resize listener. The initialized flag is only latched when a
+ * window exists, so a server render doesn't prevent the client
+ * from initializing later.
  *
  * @returns {void}
  */
 const ensureSizeTracker = () =>
 {
-	if (isInitialized)
+	if (isInitialized || typeof window === 'undefined')
 	{
 		return;
 	}
 
 	isInitialized = true;
-	cleanup = initializeSizeTracker() || null;
+	cleanup = initializeSizeTracker();
 };
 
 /**
- * Factory for creating responsive breakpoint atoms.
+ * Factory for creating responsive breakpoint atoms. Takes a predicate
+ * that decides whether the layout should render for the current
+ * breakpoint, so mobile-first, exact, and semantic device atoms all
+ * share one implementation.
  *
- * @param {string} targetBreakpoint - The breakpoint name (xs, sm, md, lg, xl, 2xl)
+ * @param {function(string): boolean} matches - Predicate for the current breakpoint name
  * @returns {function} The responsive atom factory function
  */
-const createResponsiveAtom = (targetBreakpoint) =>
+const createBreakpointAtom = (matches) =>
 {
 	return (callback) =>
 	{
@@ -155,12 +174,10 @@ const createResponsiveAtom = (targetBreakpoint) =>
 		// Use the On atom to watch the sizeData.size property
 		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
 		{
-			// Check if current breakpoint meets the target requirement
-			if (matchesBreakpoint(currentBreakpoint, targetBreakpoint))
+			if (matches(currentBreakpoint))
 			{
 				// Pass the current size to the callback for additional context
-				// @ts-ignore
-				return callback(sizeData.size, parent);
+				return callback(currentBreakpoint, parent);
 			}
 
 			// Return null to prevent rendering when breakpoint doesn't match
@@ -168,6 +185,16 @@ const createResponsiveAtom = (targetBreakpoint) =>
 		});
 	};
 };
+
+/**
+ * Factory for creating mobile-first responsive atoms (renders on the
+ * target breakpoint and larger).
+ *
+ * @param {string} targetBreakpoint - The breakpoint name (xs, sm, md, lg, xl, 2xl)
+ * @returns {function} The responsive atom factory function
+ */
+const createResponsiveAtom = (targetBreakpoint) =>
+	createBreakpointAtom((currentBreakpoint) => matchesBreakpoint(currentBreakpoint, targetBreakpoint));
 
 /**
  * This will create a responsive xs breakpoint atom (0px+).
@@ -235,30 +262,7 @@ export { sizeData };
  * @returns {function} The exact responsive atom factory function
  */
 const createExactBreakpointAtom = (targetBreakpoint) =>
-{
-	return (callback) =>
-	{
-		if (typeof callback !== 'function')
-		{
-			return null;
-		}
-
-		ensureSizeTracker();
-
-		// Use the On atom to watch the sizeData.size property
-		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
-		{
-			// Only render if current breakpoint exactly matches target
-			if (currentBreakpoint === targetBreakpoint)
-			{
-				return callback(currentBreakpoint, parent);
-			}
-
-			// Return null to prevent rendering when breakpoint doesn't match
-			return null;
-		});
-	};
-};
+	createBreakpointAtom((currentBreakpoint) => currentBreakpoint === targetBreakpoint);
 
 /**
  * Renders only on xs breakpoint (0-639px).
@@ -315,31 +319,7 @@ export const On2XlOnly = createExactBreakpointAtom('2xl');
  * @returns {function} The semantic responsive atom factory function
  */
 const createSemanticBreakpointAtom = (targetBreakpoints) =>
-{
-	return (callback) =>
-	{
-		if (typeof callback !== 'function')
-		{
-			return null;
-		}
-
-		ensureSizeTracker();
-
-		// Use the On atom to watch the sizeData.size property
-		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
-		{
-			// Check if current breakpoint is in the target breakpoints array
-			if (targetBreakpoints.includes(currentBreakpoint))
-			{
-				// @ts-ignore - Data class supports proxy access
-				return callback(sizeData.size, parent);
-			}
-
-			// Return null to prevent rendering when breakpoint doesn't match
-			return null;
-		});
-	};
-};
+	createBreakpointAtom((currentBreakpoint) => targetBreakpoints.includes(currentBreakpoint));
 
 /**
  * Renders on phone-sized devices (xs and sm breakpoints: 0-767px).
@@ -369,8 +349,20 @@ export const OnTablet = createSemanticBreakpointAtom(['md']);
 export const OnDesktop = createSemanticBreakpointAtom(['lg', 'xl', '2xl']);
 
 /**
- * Export cleanup function for testing or manual cleanup.
+ * Tears down the size tracking system and allows it to be lazily
+ * re-initialized by the next responsive atom (useful for tests,
+ * HMR, and teardown/re-init cycles).
+ *
+ * @returns {void}
  */
-export { cleanup as cleanupSizeTracker };
+export const cleanupSizeTracker = () =>
+{
+	if (cleanup)
+	{
+		cleanup();
+		cleanup = null;
+	}
+	isInitialized = false;
+};
 
 

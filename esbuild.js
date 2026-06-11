@@ -35,16 +35,18 @@ const collectEntryPoints = (dir) =>
  * an app that only imports `Div` never ships the responsive/size-tracking
  * code, and an app that never uses conditional atoms can drop `on.js`.
  *
- * `bundle: false` transpiles and minifies each file in place while leaving
- * the relative `import`/`export` statements untouched.
+ * `bundle: false` transpiles each file in place while leaving the
+ * relative `import`/`export` statements untouched. The output is left
+ * unminified so consumers get readable code and usable stack traces;
+ * app bundlers minify the final bundle anyway.
  */
 build({
 	entryPoints: collectEntryPoints('src'),
 	outdir: 'dist',
 	outbase: 'src',
 	bundle: false,
-	sourcemap: true,
-	minify: true,
+	sourcemap: false,
+	minify: false,
 	treeShaking: true,
 	format: 'esm',
 	target: ['es2020']

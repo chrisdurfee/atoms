@@ -1,5 +1,5 @@
-import { Builder } from "@base-framework/base";
 import { Comment as BaseComment } from "../comment.js";
+import { insertAfterPlaceholder, removePreviousNodes } from "../render.js";
 
 /**
  * This will set up the update layout function.
@@ -12,15 +12,30 @@ import { Comment as BaseComment } from "../comment.js";
 const updateLayout = (callBack, ele, parent) =>
 {
 	/**
-	 * This will remove the previous element if it exists.
+	 * This will remove the previous nodes if they exist.
 	 */
-	if (ele._prevEle)
+	removePreviousNodes(ele);
+
+	/**
+	 * Guard against the comment element being detached
+	 * from the DOM before running the user callback.
+	 */
+	if (!ele.parentNode)
 	{
-		Builder.removeNode(ele._prevEle);
-		ele._prevEle = null;
+		return;
 	}
 
-	const layout = callBack(parent);
+	let layout;
+	try
+	{
+		layout = callBack(parent);
+	}
+	catch (error)
+	{
+		console.error('Base Atoms: a UseParent callback threw an error.', error);
+		return;
+	}
+
 	if (layout == null)
 	{
 		return;
@@ -30,10 +45,14 @@ const updateLayout = (callBack, ele, parent) =>
 	 * This will build the layout and insert it after the
 	 * comment element.
 	 */
-	const frag = Builder.build(layout, null, parent);
-	ele._prevEle = frag.childNodes[0];
-
-	ele.parentNode.insertBefore(frag, ele.nextSibling);
+	try
+	{
+		insertAfterPlaceholder(layout, ele, parent);
+	}
+	catch (error)
+	{
+		console.error('Base Atoms: failed to build a UseParent layout.', error);
+	}
 };
 
 /**
@@ -45,14 +64,7 @@ const updateLayout = (callBack, ele, parent) =>
 const Comment = (props) => BaseComment({
 	type: 'use',
 	onCreated: props.onCreated,
-	onDestroyed: (ele) =>
-	{
-		if (ele._prevEle)
-		{
-			Builder.removeNode(ele._prevEle);
-			ele._prevEle = null;
-		}
-	}
+	onDestroyed: (ele) => removePreviousNodes(ele)
 });
 
 /**

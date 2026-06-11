@@ -1,5 +1,6 @@
-import { Builder, dataBinder } from "@base-framework/base";
+import { dataBinder } from "@base-framework/base";
 import { Comment as BaseComment } from "../comment.js";
+import { insertAfterPlaceholder, removePreviousNodes } from "../render.js";
 
 /**
  * Data source types for conditional rendering atoms.
@@ -34,6 +35,21 @@ const getDataSource = (parent, sourceType) =>
 };
 
 /**
+ * Resolves a fallback value. Function fallbacks are invoked so they
+ * can return a layout; any other value is returned as-is.
+ *
+ * @param {*} fallback - The fallback value or function
+ * @param {*} value - The current watched value
+ * @param {object} ele - The placeholder element
+ * @param {object} parent - The parent component
+ * @returns {*} The resolved fallback layout
+ */
+const resolveFallback = (fallback, value, ele, parent) =>
+{
+	return (typeof fallback === 'function') ? fallback(value, ele, parent) : fallback;
+};
+
+/**
  * Creates a conditional callback that only executes when the value equals the expected value.
  *
  * @param {function} callback - The callback to execute
@@ -45,7 +61,9 @@ const createEqualityCallback = (callback, expectedValue, fallback = null) =>
 {
 	return (value, ele, parent) =>
 	{
-		return (value === expectedValue) ? callback(value, ele, parent) : fallback;
+		return (value === expectedValue)
+			? callback(value, ele, parent)
+			: resolveFallback(fallback, value, ele, parent);
 	};
 };
 
@@ -58,19 +76,23 @@ const createEqualityCallback = (callback, expectedValue, fallback = null) =>
  */
 const createBooleanCallback = (callback, fallback = null) =>
 {
-	return createEqualityCallback(callback, true, fallback);
+	return (value, ele, parent) =>
+	{
+		return (value)
+			? callback(value, ele, parent)
+			: resolveFallback(fallback, value, ele, parent);
+	};
 };
 
 /**
  * Generic factory for creating conditional rendering atoms.
  *
  * @param {string} dataSourceType - The type of data source to use
- * @param {string|null} [defaultProp=null] - Default property name for this atom type
  * @param {function|null} [callbackTransformer=null] - Function to transform the callback
  * @param {number} [requiredArgs=2] - Number of args (excluding callback) that indicate data source was provided
  * @returns {function} The atom factory function
  */
-const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTransformer = null, requiredArgs = 2) =>
+const createConditionalAtom = (dataSourceType, callbackTransformer = null, requiredArgs = 2) =>
 {
 	return (...args) =>
 	{
@@ -87,19 +109,29 @@ const createConditionalAtom = (dataSourceType, defaultProp = null, callbackTrans
 			{
 				const localSettings = [...settings];
 
-				// Auto-inject data source if not provided
-				if (localSettings.length < requiredArgs)
+				/**
+				 * Auto-inject the data source if not provided. When no
+				 * data source is passed, the first argument is the prop
+				 * name (a string), so a string first argument also
+				 * indicates the data source was omitted.
+				 */
+				if (localSettings.length < requiredArgs || typeof localSettings[0] === 'string')
 				{
 					const data = getDataSource(parent, dataSourceType);
 					localSettings.unshift(data);
 				}
 
-				// Use default property if provided and not specified
-				const prop = defaultProp || localSettings[1];
-				const finalCallback = callbackTransformer ? callbackTransformer(callback, localSettings) : callback;
+				const data = localSettings[0];
+				const prop = localSettings[1];
+				if (!data || typeof prop !== 'string')
+				{
+					console.error('Base Atoms: unable to resolve the data source or property for a conditional atom.', { data, prop });
+					return;
+				}
 
+				const finalCallback = callbackTransformer ? callbackTransformer(callback, localSettings) : callback;
 				const update = updateLayout(finalCallback, ele, prop, parent);
-				dataBinder.watch(ele, localSettings[0], prop, update);
+				dataBinder.watch(ele, data, prop, update);
 			}
 		});
 	};
@@ -136,9 +168,16 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 					localSettings.unshift(data);
 				}
 
+				const data = localSettings[0];
+				if (!data)
+				{
+					console.error('Base Atoms: unable to resolve the data source for a conditional atom.');
+					return;
+				}
+
 				const finalCallback = callbackTransformer(callback, localSettings);
 				const update = updateLayout(finalCallback, ele, prop, parent);
-				dataBinder.watch(ele, localSettings[0], prop, update);
+				dataBinder.watch(ele, data, prop, update);
 			}
 		});
 	};
@@ -165,11 +204,17 @@ const updateLayout = (callBack, ele, prop, parent) =>
 {
 	/**
 	 * @type {*} lastValue - Tracks the last rendered value to
-	 * skip redundant updates for primitive values. This prevents
-	 * the duplicate initial render caused by dataBinder.watch()
-	 * calling the callback immediately while the Data constructor's
-	 * publish is still queued in the microtask. If that duplicate
-	 * render throws, it can permanently break the DataPubSub flush.
+	 * skip redundant updates for primitive values.
+	 *
+	 * Starting as undefined intentionally skips the immediate
+	 * publish from dataBinder.watch() when the watched value has
+	 * not been set yet. Without this, every conditional atom on a
+	 * page renders its empty/fallback branch on mount and then
+	 * tears it down and rebuilds when the real value arrives,
+	 * doubling the render work on every page switch. When the
+	 * watched value already exists at mount (route params, app
+	 * state, resumed components), the initial publish carries a
+	 * defined value and renders normally.
 	 */
 	let lastValue;
 
@@ -193,26 +238,37 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		lastValue = value;
 
 		/**
-		 * This will remove the previous element if it exists.
+		 * This will remove the previous nodes if they exist.
 		 */
-		if (ele._prevEle)
-		{
-			Builder.removeNode(ele._prevEle);
-			ele._prevEle = null;
-		}
+		removePreviousNodes(ele);
 
-		let layout = callBack(value, ele, parent);
-		if (layout == null)
+		/**
+		 * Guard against the comment element being detached
+		 * from the DOM (e.g. parent was removed during an
+		 * update cycle) before running the user callback.
+		 */
+		if (!ele.parentNode)
 		{
 			return;
 		}
 
 		/**
-		 * Guard against the comment element being detached
-		 * from the DOM (e.g. parent was removed during an
-		 * update cycle).
+		 * The user callback and layout build are wrapped so a
+		 * throwing callback cannot break the data pub/sub flush
+		 * and silently kill all subsequent updates.
 		 */
-		if (!ele.parentNode)
+		let layout;
+		try
+		{
+			layout = callBack(value, ele, parent);
+		}
+		catch (error)
+		{
+			console.error('Base Atoms: a conditional render callback threw an error.', error);
+			return;
+		}
+
+		if (layout == null)
 		{
 			return;
 		}
@@ -221,10 +277,14 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		 * This will build the layout and insert it after the
 		 * comment element.
 		 */
-		const frag = Builder.build(layout, null, parent);
-		ele._prevEle = frag.childNodes[0];
-
-		ele.parentNode.insertBefore(frag, ele.nextSibling);
+		try
+		{
+			insertAfterPlaceholder(layout, ele, parent);
+		}
+		catch (error)
+		{
+			console.error('Base Atoms: failed to build a conditional layout.', error);
+		}
 	};
 };
 
@@ -237,14 +297,7 @@ const updateLayout = (callBack, ele, prop, parent) =>
 const Comment = (props) => BaseComment({
 	type: 'on',
 	onCreated: props.onCreated,
-	onDestroyed: (ele) =>
-	{
-		if (ele._prevEle)
-		{
-			Builder.removeNode(ele._prevEle);
-			ele._prevEle = null;
-		}
-	}
+	onDestroyed: (ele) => removePreviousNodes(ele)
 });
 
 /**
@@ -339,7 +392,6 @@ export const OnRoute = createConditionalAtom(DATA_SOURCES.ROUTE);
  */
 export const If = createConditionalAtom(
 	DATA_SOURCES.PARENT,
-	null,
 	(callback, settings) => createEqualityCallback(callback, settings[2]),
 	3
 );
@@ -362,7 +414,6 @@ export const If = createConditionalAtom(
  */
 export const IfState = createConditionalAtom(
 	DATA_SOURCES.STATE,
-	null,
 	(callback, settings) => createEqualityCallback(callback, settings[2]),
 	3
 );
@@ -421,16 +472,22 @@ export const OnStateLoad = createLoadStyleAtom(
  * @overload
  * @param {object} data
  * @param {function} callBack
+ * @param {function|object|null} [notOpen=null]
  *
  * @overload
  * @param {function} callBack
+ * @param {function|object|null} [notOpen=null]
  *
  * @returns {object}
  */
 export const OnOpen = createLoadStyleAtom(
 	DATA_SOURCES.PARENT,
 	'open',
-	(callback) => createBooleanCallback(callback)
+	(callback, settings) =>
+	{
+		const notOpen = (settings.length === 3) ? settings[2] : null;
+		return createBooleanCallback(callback, notOpen);
+	}
 );
 
 /**
@@ -439,16 +496,22 @@ export const OnOpen = createLoadStyleAtom(
  * @overload
  * @param {object} data
  * @param {function} callBack
+ * @param {function|object|null} [notOpen=null]
  *
  * @overload
  * @param {function} callBack
+ * @param {function|object|null} [notOpen=null]
  *
  * @returns {object}
  */
 export const OnStateOpen = createLoadStyleAtom(
 	DATA_SOURCES.STATE,
 	'open',
-	(callback) => createBooleanCallback(callback)
+	(callback, settings) =>
+	{
+		const notOpen = (settings.length === 3) ? settings[2] : null;
+		return createBooleanCallback(callback, notOpen);
+	}
 );
 
 // Re-export responsive atoms from on-size.js for backward compatibility

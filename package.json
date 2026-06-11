@@ -1,6 +1,6 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.1.5",
+	"version": "1.2.1",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
@@ -37,25 +37,24 @@
 		"package.json",
 		"readme.md",
 		"dist",
-		"copilot.md",
-		"!dist/**/*.map"
+		"copilot.md"
 	],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
 			"types": "./dist/types/atoms.d.ts",
 			"import": "./dist/atoms.js",
-			"require": "./dist/atoms.js"
+			"default": "./dist/atoms.js"
 		},
 		"./on": {
 			"types": "./dist/types/on/on.d.ts",
 			"import": "./dist/on/on.js",
-			"require": "./dist/on/on.js"
+			"default": "./dist/on/on.js"
 		},
 		"./use": {
 			"types": "./dist/types/use/use.d.ts",
 			"import": "./dist/use/use.js",
-			"require": "./dist/use/use.js"
+			"default": "./dist/use/use.js"
 		},
 		"./copilot.md": "./copilot.md"
 	},

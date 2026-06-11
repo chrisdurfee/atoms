@@ -100,7 +100,7 @@ export const Body = Atom((props, children) => Tag({ ...props, tag: 'body' }, chi
  * @param {?Array<any>} children - Children elements of the div.
  * @returns {object} - Returns an object representing the div element.
  */
-export const Div = Atom((props, children) => Tag(props, children));
+export const Div = Atom((props, children) => Tag({ ...props, tag: 'div' }, children));
 
 /**
  * Creates a dialog element.
@@ -837,6 +837,153 @@ export const Bdo = Atom((props, children) => Tag({ ...props, tag: 'bdo' }, child
  * @returns {object} - Returns an object representing the element.
  */
 export const Wbr = Atom((props) => Tag({ ...props, tag: 'wbr' }));
+
+/**
+ * Creates a picture element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Picture = Atom((props, children) => Tag({ ...props, tag: 'picture' }, children));
+
+/**
+ * Creates a source element (for picture, audio, and video).
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Source = Atom((props) => Tag({ ...props, tag: 'source' }));
+
+/**
+ * Creates a track element (for audio and video).
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Track = Atom((props) => Tag({ ...props, tag: 'track' }));
+
+/**
+ * Creates a caption element (table caption).
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Caption = Atom((props, children) => Tag({ ...props, tag: 'caption' }, children));
+
+/**
+ * Creates a colgroup element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Colgroup = Atom((props, children) => Tag({ ...props, tag: 'colgroup' }, children));
+
+/**
+ * Creates a col element.
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Col = Atom((props) => Tag({ ...props, tag: 'col' }));
+
+/**
+ * Creates a datalist element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Datalist = Atom((props, children) => Tag({ ...props, tag: 'datalist' }, children));
+
+/**
+ * Creates an optgroup element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Optgroup = Atom((props, children) => Tag({ ...props, tag: 'optgroup' }, children));
+
+/**
+ * Creates an output element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Output = Atom((props, children) => Tag({ ...props, tag: 'output' }, children));
+
+/**
+ * Creates a template element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Template = Atom((props, children) => Tag({ ...props, tag: 'template' }, children));
+
+/**
+ * Creates a noscript element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Noscript = Atom((props, children) => Tag({ ...props, tag: 'noscript' }, children));
+
+/**
+ * Creates an address element.
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Address = Atom((props, children) => Tag({ ...props, tag: 'address' }, children));
+
+/**
+ * Creates a del element (deleted text).
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Del = Atom((props, children) => Tag({ ...props, tag: 'del' }, children));
+
+/**
+ * Creates an ins element (inserted text).
+ *
+ * @param {object} props - Properties for the element.
+ * @param {?Array<any>} children - Children elements.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Ins = Atom((props, children) => Tag({ ...props, tag: 'ins' }, children));
+
+/**
+ * Creates an embed element.
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Embed = Atom((props) => Tag({ ...props, tag: 'embed' }));
+
+/**
+ * Creates an area element (for image maps).
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Area = Atom((props) => Tag({ ...props, tag: 'area' }));
+
+/**
+ * Creates a base element.
+ *
+ * @param {object} props - Properties for the element.
+ * @returns {object} - Returns an object representing the element.
+ */
+export const Base = Atom((props) => Tag({ ...props, tag: 'base' }));
 
 /**
  * This will create a comment.
