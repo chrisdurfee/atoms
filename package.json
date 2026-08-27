@@ -1,6 +1,6 @@
 {
 	"name": "@base-framework/atoms",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "This will add default atoms to the base framework.",
 	"main": "./dist/atoms.js",
 	"scripts": {
@@ -26,10 +26,11 @@
 		"url": "https://github.com/chrisdurfee/atoms/issues"
 	},
 	"devDependencies": {
+		"@base-framework/base": "^3.0.258",
 		"esbuild": "^0.25.0",
 		"typescript": "^5.4.2"
 	},
-	"dependencies": {
+	"peerDependencies": {
 		"@base-framework/base": "^3.0.258"
 	},
 	"types": "dist/types/atoms.d.ts",
