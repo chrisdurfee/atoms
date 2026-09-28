@@ -26,9 +26,9 @@ const getDataSource = (parent, sourceType) =>
 		case DATA_SOURCES.PARENT:
 			return getParentData(parent);
 		case DATA_SOURCES.STATE:
-			return parent.state;
+			return parent ? parent.state : null;
 		case DATA_SOURCES.ROUTE:
-			return parent.route;
+			return parent ? parent.route : null;
 		default:
 			return null;
 	}
@@ -90,9 +90,10 @@ const createBooleanCallback = (callback, fallback = null) =>
  * @param {string} dataSourceType - The type of data source to use
  * @param {function|null} [callbackTransformer=null] - Function to transform the callback
  * @param {number} [requiredArgs=2] - Number of args (excluding callback) that indicate data source was provided
+ * @param {function|null} [rendersUndefined=null] - Predicate receiving the resolved settings that returns true when the atom renders something for an undefined value
  * @returns {function} The atom factory function
  */
-const createConditionalAtom = (dataSourceType, callbackTransformer = null, requiredArgs = 2) =>
+const createConditionalAtom = (dataSourceType, callbackTransformer = null, requiredArgs = 2, rendersUndefined = null) =>
 {
 	return (...args) =>
 	{
@@ -130,7 +131,8 @@ const createConditionalAtom = (dataSourceType, callbackTransformer = null, requi
 				}
 
 				const finalCallback = callbackTransformer ? callbackTransformer(callback, localSettings) : callback;
-				const update = updateLayout(finalCallback, ele, prop, parent);
+				const renderUndefined = rendersUndefined ? rendersUndefined(localSettings) : false;
+				const update = updateLayout(finalCallback, ele, prop, parent, renderUndefined);
 				dataBinder.watch(ele, data, prop, update);
 			}
 		});
@@ -138,14 +140,23 @@ const createConditionalAtom = (dataSourceType, callbackTransformer = null, requi
 };
 
 /**
+ * Checks whether load-style atom settings include a fallback layout.
+ *
+ * @param {Array<any>} settings - The resolved settings (data, callback, fallback)
+ * @returns {boolean}
+ */
+const hasFallback = (settings) => settings.length === 3 && settings[2] != null;
+
+/**
  * Special factory for OnLoad-style functions that have different argument patterns.
  *
  * @param {string} dataSourceType - The type of data source to use
  * @param {string} prop - The property name to watch
  * @param {function} callbackTransformer - Function to transform the callback
+ * @param {function|null} [rendersUndefined=null] - Predicate receiving the resolved settings that returns true when the atom renders something for an undefined value
  * @returns {function} The atom factory function
  */
-const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
+const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer, rendersUndefined = null) =>
 {
 	return (...args) =>
 	{
@@ -176,7 +187,8 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 				}
 
 				const finalCallback = callbackTransformer(callback, localSettings);
-				const update = updateLayout(finalCallback, ele, prop, parent);
+				const renderUndefined = rendersUndefined ? rendersUndefined(localSettings) : false;
+				const update = updateLayout(finalCallback, ele, prop, parent, renderUndefined);
 				dataBinder.watch(ele, data, prop, update);
 			}
 		});
@@ -192,31 +204,45 @@ const createLoadStyleAtom = (dataSourceType, prop, callbackTransformer) =>
 const isObject = (value) => value !== null && typeof value === 'object';
 
 /**
+ * Sentinel marking a placeholder that has not rendered yet. It can
+ * never equal a published value, so the first publish is always
+ * distinguishable from a repeated one.
+ *
+ * @type {object}
+ */
+const NOT_RENDERED = {};
+
+/**
  * This will set up the update layout function.
  *
  * @param {function} callBack
  * @param {object} ele
  * @param {string} prop
  * @param {object} parent
+ * @param {boolean} [renderUndefined=false] - Render the first publish even when the value is undefined
  * @returns {function}
  */
-const updateLayout = (callBack, ele, prop, parent) =>
+const updateLayout = (callBack, ele, prop, parent, renderUndefined = false) =>
 {
 	/**
 	 * @type {*} lastValue - Tracks the last rendered value to
 	 * skip redundant updates for primitive values.
 	 *
-	 * Starting as undefined intentionally skips the immediate
-	 * publish from dataBinder.watch() when the watched value has
-	 * not been set yet. Without this, every conditional atom on a
-	 * page renders its empty/fallback branch on mount and then
-	 * tears it down and rebuilds when the real value arrives,
-	 * doubling the render work on every page switch. When the
-	 * watched value already exists at mount (route params, app
+	 * Starting as the NOT_RENDERED sentinel lets the immediate
+	 * publish from dataBinder.watch() be skipped when the watched
+	 * value has not been set yet (undefined). Without this, every
+	 * conditional atom on a page renders its empty branch on mount
+	 * and then tears it down and rebuilds when the real value
+	 * arrives, doubling the render work on every page switch. When
+	 * the watched value already exists at mount (route params, app
 	 * state, resumed components), the initial publish carries a
 	 * defined value and renders normally.
+	 *
+	 * Atoms that render something for undefined (a fallback such
+	 * as a loading skeleton, or an If comparing to undefined) set
+	 * renderUndefined so that first publish is not skipped.
 	 */
-	let lastValue;
+	let lastValue = NOT_RENDERED;
 
 	/**
 	 * This will update the layout.
@@ -227,6 +253,15 @@ const updateLayout = (callBack, ele, prop, parent) =>
 	return (value) =>
 	{
 		/**
+		 * Skip the undefined publishes that arrive before the
+		 * first render when nothing would be rendered for them.
+		 */
+		if (lastValue === NOT_RENDERED && value === undefined && !renderUndefined)
+		{
+			return;
+		}
+
+		/**
 		 * Skip redundant updates for the same primitive value.
 		 * Object values (arrays, objects) always pass through
 		 * since their contents may have changed.
@@ -235,12 +270,6 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		{
 			return;
 		}
-		lastValue = value;
-
-		/**
-		 * This will remove the previous nodes if they exist.
-		 */
-		removePreviousNodes(ele);
 
 		/**
 		 * Guard against the comment element being detached
@@ -249,6 +278,8 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		 */
 		if (!ele.parentNode)
 		{
+			lastValue = value;
+			removePreviousNodes(ele);
 			return;
 		}
 
@@ -256,6 +287,18 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		 * The user callback and layout build are wrapped so a
 		 * throwing callback cannot break the data pub/sub flush
 		 * and silently kill all subsequent updates.
+		 *
+		 * The callback runs before the previous nodes are
+		 * removed, so a throwing callback leaves the previous
+		 * render in place and a later publish of the same value
+		 * retries.
+		 *
+		 * The previous nodes are still removed before the new
+		 * layout is built. Building first would let a new
+		 * persisted child resume the scope of the child it is
+		 * replacing while that child is still alive, and the old
+		 * child's teardown would then drop the new child's
+		 * persisted entry.
 		 */
 		let layout;
 		try
@@ -269,6 +312,20 @@ const updateLayout = (callBack, ele, prop, parent) =>
 		}
 
 		if (layout == null)
+		{
+			lastValue = value;
+			removePreviousNodes(ele);
+			return;
+		}
+
+		lastValue = value;
+		removePreviousNodes(ele);
+
+		/**
+		 * The callback may have detached the placeholder while
+		 * it ran, so there is nowhere left to insert.
+		 */
+		if (!ele.parentNode)
 		{
 			return;
 		}
@@ -308,6 +365,11 @@ const Comment = (props) => BaseComment({
  */
 export const getParentData = (parent) =>
 {
+	if (!parent)
+	{
+		return null;
+	}
+
 	if (parent.data)
 	{
 		return parent.data;
@@ -375,6 +437,64 @@ export const OnState = createConditionalAtom(DATA_SOURCES.STATE);
 export const OnRoute = createConditionalAtom(DATA_SOURCES.ROUTE);
 
 /**
+ * This will create a match data tag. The watched value is passed to
+ * the predicate and the layout is only rebuilt when the predicate
+ * result flips, so value changes that keep the same match (e.g. a
+ * breakpoint moving from lg to xl for a desktop atom) don't rebuild
+ * the subtree. The callback is only called while the predicate
+ * matches; nothing is rendered otherwise.
+ *
+ * @param {object} data - The data source to watch
+ * @param {string} prop - The property name to watch
+ * @param {function(*): boolean} matches - Predicate for the watched value
+ * @param {function} callBack - Called with (value, ele, parent) when the predicate matches
+ * @returns {object|null}
+ */
+export const OnMatch = (data, prop, matches, callBack) =>
+{
+	if (typeof callBack !== 'function')
+	{
+		return null;
+	}
+
+	return Comment(
+	{
+		onCreated: (ele, parent) =>
+		{
+			if (!data || typeof prop !== 'string')
+			{
+				console.error('Base Atoms: unable to resolve the data source or property for a conditional atom.', { data, prop });
+				return;
+			}
+
+			const update = updateLayout(
+				(value) => matches(value) ? callBack(value, ele, parent) : null,
+				ele,
+				prop,
+				parent
+			);
+
+			/**
+			 * @type {boolean|null} lastMatch - The last predicate
+			 * result, null until the first publish.
+			 */
+			let lastMatch = null;
+			dataBinder.watch(ele, data, prop, (value) =>
+			{
+				const matched = (matches(value) === true);
+				if (matched === lastMatch)
+				{
+					return;
+				}
+
+				lastMatch = matched;
+				update(value);
+			});
+		}
+	});
+};
+
+/**
  * This will create an if data tag.
  *
  * @overload
@@ -393,7 +513,8 @@ export const OnRoute = createConditionalAtom(DATA_SOURCES.ROUTE);
 export const If = createConditionalAtom(
 	DATA_SOURCES.PARENT,
 	(callback, settings) => createEqualityCallback(callback, settings[2]),
-	3
+	3,
+	(settings) => settings[2] === undefined
 );
 
 /**
@@ -415,7 +536,8 @@ export const If = createConditionalAtom(
 export const IfState = createConditionalAtom(
 	DATA_SOURCES.STATE,
 	(callback, settings) => createEqualityCallback(callback, settings[2]),
-	3
+	3,
+	(settings) => settings[2] === undefined
 );
 
 /**
@@ -439,7 +561,8 @@ export const OnLoad = createLoadStyleAtom(
 	{
 		const notLoaded = (settings.length === 3) ? settings[2] : null;
 		return createBooleanCallback(callback, notLoaded);
-	}
+	},
+	hasFallback
 );
 
 /**
@@ -463,7 +586,8 @@ export const OnStateLoad = createLoadStyleAtom(
 	{
 		const notLoaded = (settings.length === 3) ? settings[2] : null;
 		return createBooleanCallback(callback, notLoaded);
-	}
+	},
+	hasFallback
 );
 
 /**
@@ -487,7 +611,8 @@ export const OnOpen = createLoadStyleAtom(
 	{
 		const notOpen = (settings.length === 3) ? settings[2] : null;
 		return createBooleanCallback(callback, notOpen);
-	}
+	},
+	hasFallback
 );
 
 /**
@@ -511,7 +636,8 @@ export const OnStateOpen = createLoadStyleAtom(
 	{
 		const notOpen = (settings.length === 3) ? settings[2] : null;
 		return createBooleanCallback(callback, notOpen);
-	}
+	},
+	hasFallback
 );
 
 // Re-export responsive atoms from on-size.js for backward compatibility

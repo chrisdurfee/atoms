@@ -1,5 +1,5 @@
 import { Data } from "@base-framework/base";
-import { On } from "./on.js";
+import { OnMatch } from "./on.js";
 
 /**
  * Tailwind CSS breakpoint sizes (mobile-first).
@@ -104,11 +104,20 @@ const initializeSizeTracker = () =>
 			const newWidth = window.innerWidth;
 			const newBreakpoint = getBreakpointName(newWidth);
 
+			/**
+			 * Keep the width current on every throttled frame so
+			 * sizeData.width is never stale within a breakpoint.
+			 */
 			// @ts-ignore
-			if (newBreakpoint !== sizeData.size)
+			if (newWidth !== sizeData.width)
 			{
 				// @ts-ignore
 				sizeData.width = newWidth;
+			}
+
+			// @ts-ignore
+			if (newBreakpoint !== sizeData.size)
+			{
 				// @ts-ignore
 				sizeData.size = newBreakpoint;
 			}
@@ -171,17 +180,16 @@ const createBreakpointAtom = (matches) =>
 
 		ensureSizeTracker();
 
-		// Use the On atom to watch the sizeData.size property
-		return On(sizeData, 'size', (currentBreakpoint, ele, parent) =>
+		/**
+		 * Watch sizeData.size but only rebuild when the match result
+		 * flips, so moving between two matching breakpoints (e.g. lg
+		 * to xl for a desktop atom) keeps the current subtree. Nothing
+		 * renders while the breakpoint doesn't match.
+		 */
+		return OnMatch(sizeData, 'size', matches, (currentBreakpoint, ele, parent) =>
 		{
-			if (matches(currentBreakpoint))
-			{
-				// Pass the current size to the callback for additional context
-				return callback(currentBreakpoint, parent);
-			}
-
-			// Return null to prevent rendering when breakpoint doesn't match
-			return null;
+			// Pass the current size to the callback for additional context
+			return callback(currentBreakpoint, parent);
 		});
 	};
 };

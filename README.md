@@ -463,7 +463,7 @@ The responsive atoms use a global Data object that tracks the current window siz
 1. The window width is measured
 2. The appropriate breakpoint name is determined (xs, sm, md, lg, xl, 2xl)
 3. The global `sizeData.size` property is updated
-4. All responsive atoms automatically re-evaluate and show/hide content accordingly
+4. Each responsive atom re-evaluates its match, and only rebuilds its content when the match flips (moving from `lg` to `xl` keeps an `OnDesktop` subtree as is)
 
 This system provides:
 - **Efficient Performance**: Single global resize listener for all responsive atoms
@@ -575,6 +575,26 @@ Div({ class: "responsive-banner" }, [
 | **Mobile-First** (`OnSm`, `OnMd`, etc.) | Shows on breakpoint AND larger | Progressive enhancement, adding features for larger screens |
 | **Semantic** (`OnPhone`, `OnTablet`, `OnDesktop`) | Shows only on device category | Clean device-specific layouts |
 | **Exact** (`OnSmOnly`, `OnMdOnly`, etc.) | Shows only on specific breakpoint | Precise responsive control, unique layouts per size |
+
+`sizeData` (the tracked `size` and `width`) and `cleanupSizeTracker()` are exported from the package root.
+
+### OnVisible Atom
+
+`OnVisible` renders its content only when its wrapper scrolls near the viewport. Until then it shows an optional placeholder and reserves a min height, so the page doesn't jump. All `OnVisible` atoms with the same `rootMargin` share one IntersectionObserver.
+
+```javascript
+import { OnVisible } from '@base-framework/atoms';
+
+OnVisible((parent) => CommentsSection(), {
+	placeholder: Skeleton(),  // shown until visible (optional)
+	minHeight: '480px',       // reserved until visible (optional)
+	rootMargin: '200px',      // how far ahead to load (default '200px')
+	class: 'my-section',      // wrapper class (optional)
+	tag: 'section'            // wrapper tag (default 'div')
+})
+```
+
+Browsers without IntersectionObserver render the content at once.
 
 ## Contributing
 

@@ -1,17 +1,23 @@
 import { Atom } from '@base-framework/base';
 import { If, IfState, On, On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnLoad, OnMd, OnMdOnly, OnOpen, OnPhone, OnRoute, OnSm, OnSmOnly, OnState, OnStateLoad, OnStateOpen, OnTablet, OnXl, OnXlOnly, OnXs, OnXsOnly } from './on/on.js';
+import { cleanupSizeTracker, sizeData } from './on/on-size.js';
+import { OnVisible } from './on/on-visible.js';
 import { UseParent } from './use/use.js';
-export { If, IfState, On, On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnLoad, OnMd, OnMdOnly, OnOpen, OnPhone, OnRoute, OnSm, OnSmOnly, OnState, OnStateLoad, OnStateOpen, OnTablet, OnXl, OnXlOnly, OnXs, OnXsOnly, UseParent };
+export { cleanupSizeTracker, If, IfState, On, On2Xl, On2XlOnly, OnDesktop, OnLg, OnLgOnly, OnLoad, OnMd, OnMdOnly, OnOpen, OnPhone, OnRoute, OnSm, OnSmOnly, OnState, OnStateLoad, OnStateOpen, OnTablet, OnVisible, OnXl, OnXlOnly, OnXs, OnXsOnly, sizeData, UseParent };
 
 /**
  * Creates a generic HTML tag.
+ *
+ * Every caller passes a new props object (`{ ...props, tag }`), so the
+ * children are set on it directly instead of copying it again.
  *
  * @param {object} props - Properties for the HTML element.
  * @param {?Array<any>} children - Children elements of the HTML element.
  * @returns {object} - Returns an object representing the HTML element.
  */
 const Tag = (props, children = null) => {
-    return { ...props, children };
+    props.children = children;
+    return props;
 };
 
 /**
@@ -20,7 +26,7 @@ const Tag = (props, children = null) => {
  * @param {object} props - Properties for the HTML element.
  * @returns {object} - Returns an object representing the HTML element.
  */
-export const Doctype = (props) => ({ ...props, tag: 'DOCTYPE' });
+export const Doctype = Atom((props) => Tag({ ...props, tag: 'DOCTYPE' }));
 
 /**
  * Creates an HTML tag.
@@ -62,11 +68,10 @@ export const Head = Atom((props, children) => Tag({ ...props, tag: 'head' }, chi
  * Creates a title tag.
  *
  * @param {object} props - Properties for the title element.
+ * @param {?Array<any>} children - Children elements of the title.
+ * @returns {object} - Returns an object representing the title element.
  */
-export const Title = (props) =>
-{
-    return { ...props, tag: 'title' };
-};
+export const Title = Atom((props, children) => Tag({ ...props, tag: 'title' }, children));
 
 /**
  * Creates a meta tag.
@@ -74,7 +79,7 @@ export const Title = (props) =>
  * @param {object} props - Properties for the meta element.
  * @returns {object} - Returns an object representing the meta element.
  */
-export const Meta = (props) => ({ ...props, tag: 'meta' });
+export const Meta = Atom((props) => Tag({ ...props, tag: 'meta' }));
 
 /**
  * Creates a link tag.
@@ -82,7 +87,7 @@ export const Meta = (props) => ({ ...props, tag: 'meta' });
  * @param {object} props - Properties for the link element.
  * @returns {object} - Returns an object representing the link element.
  */
-export const Link = (props) => ({ ...props, tag: 'link' });
+export const Link = Atom((props) => Tag({ ...props, tag: 'link' }));
 
 /**
  * Creates a body tag.
@@ -176,8 +181,12 @@ export const Li = Atom((props, children) => Tag({ ...props, tag: 'li' }, childre
 
 /**
  * Creates an image (img) element.
+ *
+ * Images decode off the main thread by default. Pass `width` and
+ * `height` (or an aspect-ratio class) so the space is reserved
+ * before the image loads.
  */
-export const Img = Atom((props) => Tag({ ...props, tag: 'img' }));
+export const Img = Atom((props) => Tag({ decoding: 'async', ...props, tag: 'img' }));
 
 /**
  * Create a br element.
